@@ -3,7 +3,7 @@ Core configuration management
 """
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic_settings import BaseSettings
 from pydantic import Field, validator
 import yaml
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 20
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8080"]
+    CORS_ORIGINS: Union[List[str], str] = ["http://localhost:3000", "http://localhost:8080"]
     
     # Security Headers
     HSTS_MAX_AGE: int = 31536000  # 1 year in seconds
