@@ -38,6 +38,24 @@ export const authService = {
      */
     verifyEmailOtp: async (email, code) => {
         return await api.post('/auth/verify-email-otp', { email, otp_code: code });
+    },
+
+    /**
+     * Register a new user
+     * @param {Object} userData - { name, email, password }
+     * @returns {Promise<Object>} Response data
+     */
+    register: async (userData) => {
+        return await api.post('/auth/register', userData);
+    },
+
+    /**
+     * Request password reset
+     * @param {string} email 
+     * @returns {Promise<Object>} Response data
+     */
+    requestPasswordReset: async (email) => {
+        return await api.post('/auth/request-password-reset', { email });
     }
 };
 

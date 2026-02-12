@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import authService from "../../services/authService";
 import {
   Mail,
   Lock,
@@ -63,38 +64,12 @@ const RegisterPage = () => {
         password: formData.password
       };
 
-      const response = await fetch('http://localhost:8000/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(apiData)
-      });
+      // Use authService instead of direct fetch
+      // This handles the API URL correctly via apiConfig
+      const data = await authService.register(apiData);
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Non-JSON Response:", text);
-        throw new Error("Server error: Received non-JSON response");
-      }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Handle validation errors (422)
-        if (response.status === 422 && data.detail) {
-          // FastAPI validation errors come as an array
-          if (Array.isArray(data.detail)) {
-            const errorMessages = data.detail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ');
-            throw new Error(errorMessages);
-          }
-          // Single error message
-          if (typeof data.detail === 'string') {
-            throw new Error(data.detail);
-          }
-          // Object error
-          throw new Error(JSON.stringify(data.detail));
-        }
-        throw new Error(data.detail || data.message || "Registration failed.");
-      }
+      // authService.register returns the data directly (apiClient handles response.json())
+      // so we don't need independent response checking here as apiClient throws on error
 
       navigate("/login", { state: { message: "Account created! Please log in." } });
 

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import authService from "../../services/authService";
 import {
   Mail,
   Lock,
@@ -42,24 +43,8 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password })
-      });
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        console.error("Non-JSON Response:", text);
-        throw new Error("Server error: Received non-JSON response");
-      }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Invalid credentials");
-      }
+      // Use authService instead of direct fetch
+      const data = await authService.login(email, password);
 
       if (data.mfa_required) {
         beginLoginFlow(data.user, data.access_token, true, data.mfa_token);

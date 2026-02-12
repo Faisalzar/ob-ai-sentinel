@@ -5,6 +5,7 @@ import { Mail, ShieldCheck, Cpu, Key, Lock, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticlesBackground from '../../components/reactbits/ParticlesBackground';
 import { useAuth } from "../../context/AuthContext";
+import authService from "../../services/authService";
 import "./Auth.css";
 
 const ForgotPasswordPage = () => {
@@ -29,22 +30,8 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/request-password-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Server error: Received non-JSON response");
-      }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Request failed");
-      }
+      // Use authService instead of direct fetch
+      const data = await authService.requestPasswordReset(email);
 
       setStatus({
         type: "success",
