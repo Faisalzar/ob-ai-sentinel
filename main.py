@@ -86,6 +86,12 @@ if not os.path.exists(uploads_dir):
     os.makedirs(uploads_dir)
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
+outputs_dir = os.path.join(os.getcwd(), "outputs")
+if not os.path.exists(outputs_dir):
+    os.makedirs(outputs_dir)
+# Mount at /api/v1/outputs to match frontend expectation
+app.mount("/api/v1/outputs", StaticFiles(directory=outputs_dir), name="outputs")
+
 
 
 # CORS Middleware
