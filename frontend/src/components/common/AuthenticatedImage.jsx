@@ -18,11 +18,25 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
           try {
             const parsed = JSON.parse(auth);
             token = parsed.token;
-          } catch {}
+          } catch { }
         }
 
         // Fetch image with authentication
-        const url = `http://localhost:8000${src}`;
+        // Use the configured API_BASE_URL, stripping the /api/v1 suffix if present since src likely contains it or is relative
+        let baseUrl = 'http://localhost:8000';
+        try {
+          const apiConfig = await import('../../services/apiConfig');
+          baseUrl = apiConfig.default.replace('/api/v1', ''); // Strip /api/v1 as it's usually part of the base but src might be full path
+        } catch (e) {
+          console.warn("Could not load apiConfig, falling back to localhost");
+        }
+
+        // Handle fully qualified URLs or relative paths
+        let url = src;
+        if (!src.startsWith('http')) {
+          url = `${baseUrl}${src.startsWith('/') ? '' : '/'}${src}`;
+        }
+
         console.log('Fetching image URL:', url);
         console.log('Has token:', !!token);
         const response = await fetch(url, {
@@ -62,9 +76,9 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
 
   if (loading) {
     return (
-      <div className={className} style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div className={className} style={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         background: '#0f0f0f',
         minHeight: '200px'
@@ -76,9 +90,9 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
 
   if (error || !imageSrc) {
     return (
-      <div className={className} style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div className={className} style={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         background: '#0f0f0f',
         minHeight: '200px',
@@ -90,9 +104,9 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
   }
 
   return (
-    <img 
-      src={imageSrc} 
-      alt={alt} 
+    <img
+      src={imageSrc}
+      alt={alt}
       className={className}
       onClick={onClick}
     />
