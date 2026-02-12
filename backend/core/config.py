@@ -89,8 +89,11 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str
     SMTP_PASSWORD: str
-    FROM_EMAIL: str
-    FROM_NAME: str = "AI Detection System"
+    FROM_Email: str
+    FROM_NAME: str = "Ob AI Sentinel"
+    
+    # Brevo Email API (HTTP) - Bypass Blocking
+    BREVO_API_KEY: Optional[str] = None
     
     # Redis & Celery
     REDIS_URL: str = "redis://localhost:6379/0"

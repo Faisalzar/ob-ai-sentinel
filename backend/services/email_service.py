@@ -6,6 +6,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import aiosmtplib
+import httpx
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -48,7 +49,40 @@ class EmailService:
         Returns:
             True if sent successfully, False otherwise
         """
+
         try:
+            # OPTION 1: Use Brevo API (HTTP) if Key is present
+            if settings.BREVO_API_KEY:
+                async with httpx.AsyncClient() as client:
+                    payload = {
+                        "sender": {"name": settings.FROM_NAME, "email": settings.FROM_EMAIL},
+                        "to": [{"email": to_email}],
+                        "subject": subject,
+                        "htmlContent": html_content
+                    }
+                    if text_content:
+                        payload["textContent"] = text_content
+                        
+                    response = await client.post(
+                        "https://api.brevo.com/v3/smtp/email",
+                        headers={
+                            "accept": "application/json",
+                            "api-key": settings.BREVO_API_KEY,
+                            "content-type": "application/json"
+                        },
+                        json=payload,
+                        timeout=10.0
+                    )
+                    
+                    if response.status_code in [200, 201, 202]:
+                        logger.info(f"Email sent via Brevo API to {to_email}")
+                        return True
+                    else:
+                        logger.error(f"Brevo API failed: {response.text}")
+                        # Fallback to SMTP or return False? Let's return False for now to see logs
+                        return False
+
+            # OPTION 2: Use SMTP (Legacy/Local)
             # Create message
             message = MIMEMultipart("alternative")
             message["From"] = f"{settings.FROM_NAME} <{settings.FROM_EMAIL}>"
