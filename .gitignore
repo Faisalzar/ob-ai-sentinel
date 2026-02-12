@@ -46,6 +46,7 @@ frontend/coverage/
 *.pt
 *.onnx
 !best.pt
+!ai/models/best.pt
 
 # Logs
 *.log
