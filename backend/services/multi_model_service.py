@@ -226,7 +226,7 @@ class MultiModelRoboflowService:
                     url,
                     params={
                         'api_key': self.api_key,
-                        'confidence': int(settings.CONFIDENCE_THRESHOLD * 100),
+                        'confidence': 1, # Get EVERYTHING > 1% and let local logic filter it
                         'overlap': int(settings.IOU_THRESHOLD * 100)
                     },
                     files={'file': f},
