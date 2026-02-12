@@ -1,0 +1,11 @@
+.text-block {
+    font-family: monospace;
+    font-size: clamp(14px, 4vw, 32px);
+    color: #fff;
+    line-height: 1.4;
+}
+
+.char {
+    will-change: transform;
+    display: inline-block;
+}

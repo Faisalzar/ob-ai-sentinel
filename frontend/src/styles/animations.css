@@ -1,0 +1,45 @@
+.ai-glow-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+}
+
+.ai-glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 180deg, rgba(56, 189, 248, 0.35), transparent, rgba(129, 140, 248, 0.4), transparent);
+  opacity: 0;
+  animation: ai-rotate 14s linear infinite;
+  transition: opacity 0.4s ease;
+}
+
+.ai-glow-card:hover::before {
+  opacity: 1;
+}
+
+@keyframes ai-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-float {
+  transform: translate3d(0, 0, 0);
+  animation: ai-float 6s ease-in-out infinite;
+}
+
+@keyframes ai-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.ai-hero-gradient {
+  background: radial-gradient(circle at 0% 0%, #1d4ed8, transparent 55%),
+    radial-gradient(circle at 100% 0%, #0ea5e9, transparent 55%),
+    radial-gradient(circle at 50% 100%, #4c1d95, #020617 60%);
+}

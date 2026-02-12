@@ -1,0 +1,113 @@
+# Main Configuration File
+app:
+  name: "AI Object Detection Backend"
+  version: "1.0.0"
+  description: "Secure FastAPI backend with YOLOv8 integration"
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  reload: false
+
+security:
+  secret_key: "${SECRET_KEY}"
+  algorithm: "HS256"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+  encryption_key: "${ENCRYPTION_KEY}"
+  
+  # Password policy
+  min_password_length: 8
+  require_uppercase: true
+  require_lowercase: true
+  require_digit: true
+  require_special: true
+  
+  # Rate limiting
+  rate_limit_per_minute: 60
+  login_rate_limit_per_minute: 5
+  max_login_attempts: 5
+  lockout_duration_minutes: 15
+  
+  # CORS
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+  
+  # Security headers
+  hsts_max_age: 31536000
+  csp_policy: "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'"
+
+database:
+  url: "${DATABASE_URL}"
+  pool_size: 10
+  max_overflow: 20
+  echo: false
+
+storage:
+  mode: "${STORAGE_MODE:local}"  # local or cloud
+  local_upload_path: "uploads"
+  local_output_path: "outputs"
+  
+  # AWS S3 Configuration
+  aws_access_key: "${AWS_ACCESS_KEY:}"
+  aws_secret_key: "${AWS_SECRET_KEY:}"
+  aws_region: "${AWS_REGION:us-east-1}"
+  aws_bucket_name: "${AWS_BUCKET_NAME:}"
+
+ai:
+  model_path: "ai/models/best.pt"
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+  device: "cpu"  # or "cuda" for GPU
+  
+  # Threat categorization
+  dangerous_classes:
+    - "gun"
+    - "pistol"
+    - "rifle"
+    - "knife"
+    - "grenade"
+    - "explosive"
+    - "bomb"
+  
+  caution_classes:
+    - "person"
+    - "suspicious_object"
+  
+  max_image_size_mb: 10
+  max_video_size_mb: 100
+  supported_image_formats:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+  supported_video_formats:
+    - ".mp4"
+    - ".avi"
+    - ".mov"
+
+logging:
+  level: "INFO"
+  format: "[%(asctime)s] %(levelname)s: %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  alert_log_path: "outputs/alerts/alerts.log"
+  audit_log_path: "outputs/audit.log"
+
+email:
+  smtp_host: "${SMTP_HOST}"
+  smtp_port: "${SMTP_PORT:587}"
+  smtp_user: "${SMTP_USER}"
+  smtp_password: "${SMTP_PASSWORD}"
+  from_email: "${FROM_EMAIL}"
+  from_name: "AI Detection System"
+
+redis:
+  url: "${REDIS_URL:redis://localhost:6379/0}"
+  
+celery:
+  broker_url: "${REDIS_URL:redis://localhost:6379/0}"
+  result_backend: "${REDIS_URL:redis://localhost:6379/0}"
+
+mfa:
+  issuer_name: "AI Object Detection"
+  otp_valid_window: 1
+  backup_codes_count: 10

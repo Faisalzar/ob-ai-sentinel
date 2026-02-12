@@ -1,0 +1,247 @@
+/* LoginPage.css - Mechanical Dark Theme */
+
+:root {
+    --primary-accent: #a78bfa;
+    /* Violet-400 */
+    --secondary-accent: #60a5fa;
+    /* Blue-400 */
+    --dark-bg: #050711;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+}
+
+.mechanical-login-root {
+    background-color: var(--dark-bg);
+    min-height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    /* Assuming Inter or sans-serif */
+    color: var(--text-primary);
+}
+
+.container {
+    position: fixed;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mechanical-login-root svg,
+.form-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Increase z-index and ensure pointer events for form */
+.form-container {
+    width: 320px;
+    /* Slightly wider for modern feel */
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* Space out elements */
+}
+
+/* Adjust SVG visibility and positioning */
+.mechanical-login-root svg {
+    width: 1200px;
+    /* Make it larger to fill space nicely */
+    pointer-events: none;
+    overflow: visible;
+    opacity: 0.8;
+    /* Subtle transparency */
+    z-index: 1;
+}
+
+/* Layout for branding */
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    z-index: 100;
+}
+
+.login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 0%, var(--primary-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+}
+
+.login-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* Form Styling */
+.form-container .form-row {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Glassmorphism Input Styling */
+.form-container .form-row input:not([type="checkbox"]):not([type="submit"]) {
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    font-size: 1rem;
+    color: white;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.form-container .form-row input:not([type="checkbox"]):not([type="submit"]):focus {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 15px rgba(167, 139, 250, 0.2);
+    background: rgba(167, 139, 250, 0.05);
+}
+
+.form-container .form-row input.valid {
+    border-color: #4ade80;
+    /* Green for valid */
+}
+
+/* Checkbox Row Styling */
+.checkbox-row {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.form-container .form-row input[type="checkbox"] {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.form-container .form-row input[type="checkbox"]:checked {
+    background: var(--primary-accent);
+    border-color: var(--primary-accent);
+}
+
+.form-container .form-row input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    user-select: none;
+}
+
+/* Submit Button styling */
+.form-container .form-row input[type="submit"] {
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: transparent;
+    /* Controlled by JS for animation until ready */
+    letter-spacing: 1px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.form-container input[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(167, 139, 250, 0.4);
+}
+
+.form-container label,
+.form-container input::placeholder {
+    font-family: inherit;
+    color: var(--text-secondary);
+}
+
+/* SVG Stroke Inversion for Dark Theme */
+.mechanical-login-root svg {
+    stroke-width: 1.2px;
+    stroke: rgba(255, 255, 255, 0.6);
+    /* Semi-transparent white */
+    fill: none;
+}
+
+/* Specific overrides for fills */
+.mechanical-login-root svg circle[fill="#000000"],
+.mechanical-login-root svg circle[fill="#000"],
+.mechanical-login-root svg path[fill="#000000"],
+.mechanical-login-root svg path[fill="#000"] {
+    fill: #ffffff;
+    /* Invert black fills to white */
+    fill-opacity: 0.8;
+}
+
+.mechanical-login-root .spray-line {
+    stroke: #white;
+}
+
+.error-message {
+    position: absolute;
+    bottom: -60px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Forgot Password Link */
+.forgot-password-link {
+    display: block;
+    text-align: right;
+    width: 100%;
+    margin-top: 0.5rem;
+    color: var(--secondary-accent);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-password-link:hover {
+    color: var(--primary-accent);
+    text-decoration: underline;
+}

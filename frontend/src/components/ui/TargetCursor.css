@@ -1,0 +1,66 @@
+.target-cursor-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: normal;
+    /* Changed from difference to normal for predictable color on dark theme */
+    transform: translate(-50%, -50%);
+}
+
+.target-cursor-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    background: #a855f7;
+    /* Purple-500 to match theme */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.target-cursor-corner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #a855f7;
+    /* Purple-500 */
+    will-change: transform;
+    box-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
+}
+
+.corner-tl {
+    transform: translate(-150%, -150%);
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 4px;
+}
+
+.corner-tr {
+    transform: translate(50%, -150%);
+    border-left: none;
+    border-bottom: none;
+    border-top-right-radius: 4px;
+}
+
+.corner-br {
+    transform: translate(50%, 50%);
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 4px;
+}
+
+.corner-bl {
+    transform: translate(-150%, 50%);
+    border-right: none;
+    border-top: none;
+    border-bottom-left-radius: 4px;
+}

@@ -1,0 +1,233 @@
+/* FeaturesPage.css */
+
+.features-page {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #030005;
+    color: white;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    /* Assuming Inter or similar is used */
+}
+
+/* --- Shared Styles (Matching About Us) --- */
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    background: linear-gradient(to right, #fff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.glass-card {
+    background: linear-gradient(180deg, rgba(15, 10, 25, 0.6) 0%, rgba(5, 5, 10, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(168, 85, 247, 0.15);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
+}
+
+.glass-card:hover {
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.15);
+}
+
+.rb-text-purple-400 {
+    color: #c084fc;
+}
+
+.rb-text-blue-400 {
+    color: #60a5fa;
+}
+
+.rb-text-green-400 {
+    color: #4ade80;
+}
+
+.rb-text-red-400 {
+    color: #f87171;
+}
+
+.rb-text-gray-400 {
+    color: #9ca3af;
+}
+
+.rb-text-gray-500 {
+    color: #6b7280;
+}
+
+/* --- Hero Section --- */
+
+.hero-section {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 24px 60px;
+    position: relative;
+    z-index: 10;
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    /* Large heading */
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    background: linear-gradient(to bottom right, #ffffff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #e9d5ff;
+    /* Light purple */
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.hero-description {
+    font-size: 1.125rem;
+    color: #9ca3af;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- Feature Stack Section --- */
+
+.features-stack {
+    padding: 60px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    /* Increased gap */
+}
+
+.feature-icon-wrapper {
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: white;
+}
+
+.feature-description {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    line-height: 1.5;
+}
+
+/* --- "Why It Matters" Section --- */
+
+.why-it-matters {
+    padding: 100px 24px;
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+
+.glass-container-wide {
+    max-width: 900px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(168, 85, 247, 0.2);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    padding: 60px 40px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.why-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.why-item h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #d8b4fe;
+    margin-bottom: 8px;
+}
+
+.why-item p {
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+/* --- Footer (Reused Styles + specific footer overrides if needed) --- */
+.footer {
+    padding: 80px 24px 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(5, 5, 8, 0.9);
+    position: relative;
+    z-index: 200;
+}
+
+.footer-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 40px;
+}
+
+.footer-link {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: #a855f7;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}

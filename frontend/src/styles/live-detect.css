@@ -1,0 +1,15 @@
+/* Live Detection Page Specific Styles */
+/* Most styles are inherited from detection.css for consistency */
+
+/* Keep unique video container overrides if necessary */
+.id-preview-container video {
+  /* Ensure video doesn't overflow container in height */
+  max-height: 70vh;
+}
+
+/* Responsive adjustments specific to live detect controls */
+@media (max-width: 640px) {
+  .id-actions {
+    flex-direction: column;
+  }
+}

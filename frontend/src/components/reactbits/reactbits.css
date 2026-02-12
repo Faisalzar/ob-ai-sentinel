@@ -1,0 +1,414 @@
+/* React Bits Helper CSS */
+.rb-relative {
+    position: relative;
+}
+
+.rb-absolute {
+    position: absolute;
+}
+
+.rb-fixed {
+    position: fixed;
+}
+
+.rb-inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.rb-z-0 {
+    z-index: 0;
+}
+
+.rb-z-10 {
+    z-index: 10;
+}
+
+.rb-w-full {
+    width: 100%;
+}
+
+.rb-h-full {
+    height: 100%;
+}
+
+.rb-min-h-screen {
+    min-height: 100vh;
+}
+
+.rb-overflow-hidden {
+    overflow: hidden;
+}
+
+.rb-flex {
+    display: flex;
+}
+
+.rb-items-center {
+    align-items: center;
+}
+
+.rb-justify-center {
+    justify-content: center;
+}
+
+.rb-text-white {
+    color: #ffffff;
+}
+
+/* Backgrounds and Borders */
+.rb-bg-dark {
+    background-color: #060010;
+}
+
+.rb-rounded-xl {
+    border-radius: 0.75rem;
+}
+
+.rb-border {
+    border-width: 1px;
+}
+
+.rb-border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.rb-bg-white-5 {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Cursor & Transitions */
+.rb-pointer-events-none {
+    pointer-events: none;
+}
+
+.rb-transition-opacity {
+    transition-property: opacity;
+}
+
+.rb-duration-300 {
+    transition-duration: 300ms;
+}
+
+/* Grid Layouts */
+.rb-grid {
+    display: grid;
+}
+
+.rb-gap-4 {
+    gap: 1rem;
+}
+
+.rb-gap-8 {
+    gap: 2rem;
+}
+
+.rb-gap-12 {
+    gap: 3rem;
+}
+
+.rb-p-4 {
+    padding: 1rem;
+}
+
+.rb-p-8 {
+    padding: 2rem;
+}
+
+.rb-py-20 {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.rb-max-w-7xl {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rb-max-w-2xl {
+    max-width: 42rem;
+}
+
+@media (min-width: 768px) {
+    .rb-md-grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rb-md-grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Typography */
+.rb-text-center {
+    text-align: center;
+}
+
+.rb-font-bold {
+    font-weight: 700;
+}
+
+.rb-text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.rb-text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.rb-text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.rb-text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.rb-text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.rb-text-gray-400 {
+    color: #9ca3af;
+}
+
+.rb-mb-4 {
+    margin-bottom: 1rem;
+}
+
+.rb-mb-8 {
+    margin-bottom: 2rem;
+}
+
+.rb-mb-12 {
+    margin-bottom: 3rem;
+}
+
+.rb-mt-8 {
+    margin-top: 2rem;
+}
+
+/* Custom Button Wrapper for ShinyText */
+.rb-btn-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.rb-btn-primary,
+.rb-btn-secondary {
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.rb-btn-primary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.rb-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.rb-btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rb-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes shine {
+    0% {
+        background-position: 100%;
+    }
+
+    100% {
+        background-position: -100%;
+    }
+}
+
+/* Additional Utility Classes for Enterprise Theme */
+.rb-z-20 {
+    z-index: 20;
+}
+
+.rb-opacity-50 {
+    opacity: 0.5;
+}
+
+.rb-opacity-10 {
+    opacity: 0.1;
+}
+
+.rb-mr-2 {
+    margin-right: 0.5rem;
+}
+
+.rb-pb-2 {
+    padding-bottom: 0.5rem;
+}
+
+.rb-border-b {
+    border-bottom-width: 1px;
+}
+
+.rb-tracking-wide {
+    letter-spacing: 0.025em;
+}
+
+.rb-tracking-widest {
+    letter-spacing: 0.1em;
+}
+
+.rb-uppercase {
+    text-transform: uppercase;
+}
+
+.rb-h-48 {
+    height: 12rem;
+}
+
+.rb-max-w-md {
+    max-width: 28rem;
+}
+
+.rb-max-w-xl {
+    max-width: 36rem;
+}
+
+.rb-w-24 {
+    width: 6rem;
+}
+
+.rb-w-2 {
+    width: 0.5rem;
+}
+
+.rb-h-2 {
+    height: 0.5rem;
+}
+
+.rb-h-1 {
+    height: 0.25rem;
+}
+
+.rb-h-px {
+    height: 1px;
+}
+
+.rb-rounded-full {
+    border-radius: 9999px;
+}
+
+.rb-inline-flex {
+    display: inline-flex;
+}
+
+.rb-hidden {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .rb-md-flex {
+        display: flex;
+    }
+}
+
+.rb-grayscale {
+    filter: grayscale(100%);
+}
+
+.rb-hover-grayscale-0:hover {
+    filter: grayscale(0);
+}
+
+/* Strict Enterprise Interaction Classes */
+.rb-btn-primary-glow {
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+}
+
+.rb-btn-primary-glow:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.rb-card-hover {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.rb-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* HERO EDGE SMOKE */
+.hero-smoke {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(70px);
+  opacity: 0.45;
+  background: rgba(168, 85, 247, 0.55);
+}
+
+.hero-smoke-top {
+  top: -60px;
+  left: 10%;
+  right: 10%;
+  height: 120px;
+}
+
+.hero-smoke-bottom {
+  bottom: -60px;
+  left: 10%;
+  right: 10%;
+  height: 120px;
+}
+
+.hero-smoke-left {
+  left: -60px;
+  top: 10%;
+  bottom: 10%;
+  width: 120px;
+}
+
+.hero-smoke-right {
+  right: -60px;
+  top: 10%;
+  bottom: 10%;
+  width: 120px;
+}

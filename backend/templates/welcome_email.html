@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .header {
+            text-align: center;
+            color: #16a34a;
+            margin-bottom: 30px;
+        }
+
+        .feature-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #16a34a;
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome to {{ app_name }}!</h1>
+        </div>
+
+        <p>Hello {{ user_name }},</p>
+
+        <p>Thank you for joining <strong>{{ app_name }}</strong>! We're excited to have you on board.</p>
+
+        <p>You now have access to our advanced AI-powered object detection system with weapon and threat detection
+            capabilities.</p>
+
+        <h3>✨ What You Can Do:</h3>
+
+        <div class="feature-box">
+            <strong>🖼️ Image Detection</strong><br>
+            Upload images and get instant object detection with threat level classification
+        </div>
+
+        <div class="feature-box">
+            <strong>🎥 Video Analysis</strong><br>
+            Process videos frame-by-frame to detect dangerous objects
+        </div>
+
+        <div class="feature-box">
+            <strong>🚨 Real-time Alerts</strong><br>
+            Get notified immediately when dangerous objects are detected
+        </div>
+
+        <div class="feature-box">
+            <strong>📊 Dashboard & Analytics</strong><br>
+            Track your detection history and view detailed statistics
+        </div>
+
+        <div class="feature-box">
+            <strong>🔐 Enterprise Security</strong><br>
+            Multi-factor authentication, encryption, and audit logging
+        </div>
+
+        <h3>🚀 Get Started:</h3>
+        <ol>
+            <li>Complete your profile setup</li>
+            <li>Enable two-factor authentication for extra security</li>
+            <li>Upload your first image or video</li>
+            <li>Explore the documentation to learn more</li>
+        </ol>
+
+        <div style="text-align: center;">
+            <a href="{{ docs_url }}" class="button">Login Now</a>
+        </div>
+
+        <p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+
+        <p>Best regards,<br>
+            <strong>The {{ app_name }} Team</strong>
+        </p>
+
+        <div class="footer">
+            <p>&copy; 2025 {{ app_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

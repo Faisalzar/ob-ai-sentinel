@@ -1,0 +1,58 @@
+# Python - Virtual Environments
+venv/
+.venv/
+env/
+.env/
+venv_new/
+.venv311/
+.venv311_new/
+
+# Python - Compiled
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*
+
+# Databases
+*.sqlite3
+*.db
+ai_detection.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Frontend - Dependencies & Build
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/coverage/
+
+# Large Model Files
+# Exclude model weights to save massive space
+# Roboflow API is primary, so local weights are optional/fallback
+*.pt
+*.onnx
+!best.pt
+
+# Logs
+*.log
+logs/
+run_out.txt
+run_err.txt
+
+# OS
+.DS_Store
+Thumbs.db

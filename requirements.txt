@@ -1,0 +1,70 @@
+# FastAPI and ASGI Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Security
+argon2-cffi==23.1.0
+cryptography==42.0.0
+python-jose[cryptography]==3.3.0
+passlib[argon2]==1.7.4
+pyotp==2.9.0
+qrcode==7.4.2
+
+# AI/ML
+ultralytics==8.1.11
+torch==2.1.2
+torchvision==0.16.2
+opencv-python==4.9.0.80
+numpy==1.26.3
+pillow==10.2.0
+
+# Configuration
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# Email
+aiosmtplib==3.0.1
+jinja2==3.1.3
+
+# Storage (S3)
+boto3==1.34.25
+botocore==1.34.25
+
+# Redis & Celery
+redis==5.0.1
+celery==5.3.6
+flower==2.0.1
+
+# Rate limiting
+slowapi==0.1.9
+
+# HTTP client
+httpx==0.26.0
+aiohttp==3.9.1
+aiofiles==23.2.1
+
+# Monitoring & Logging
+python-json-logger==2.0.7
+psutil==5.9.8
+
+# File scanning (optional - requires ClamAV installed)
+# clamd==1.0.2
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+httpx==0.26.0
+
+# Development
+black==23.12.1
+flake8==7.0.0
+mypy==1.8.0

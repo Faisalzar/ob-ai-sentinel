@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alert</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fef2f2;
+            border-radius: 10px;
+            padding: 30px;
+            border: 2px solid #dc2626;
+        }
+        .header {
+            text-align: center;
+            color: #dc2626;
+            margin-bottom: 30px;
+        }
+        .alert-box {
+            background-color: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #fca5a5;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #991b1b;
+        }
+        .detail-value {
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            background-color: #dc2626;
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ SECURITY ALERT</h1>
+            <h2>{{ app_name }}</h2>
+        </div>
+        
+        <p>Hello {{ user_name }},</p>
+        
+        <p><strong>A dangerous object has been detected in your uploaded file!</strong></p>
+        
+        <div class="alert-box">
+            <h3 style="color: #dc2626; margin-top: 0;">🚨 Detection Details</h3>
+            
+            <div class="detail-row">
+                <span class="detail-label">Object Detected:</span>
+                <span class="detail-value">{{ object_name }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Confidence Level:</span>
+                <span class="detail-value">{{ (confidence|float * 100)|round(2) }}%</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">File Name:</span>
+                <span class="detail-value">{{ filename }}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">Detection Time:</span>
+                <span class="detail-value">{{ timestamp }}</span>
+            </div>
+        </div>
+        
+        <p><strong>What to do next:</strong></p>
+        <ul>
+            <li>Review the detection results in your dashboard</li>
+            <li>Verify if this is a legitimate detection</li>
+            <li>Report false positives to improve our system</li>
+            <li>Contact authorities if this is a genuine threat</li>
+        </ul>
+        
+        <div style="text-align: center;">
+            <a href="{{ dashboard_url }}" class="button">View in Dashboard</a>
+        </div>
+        
+        <p style="color: #dc2626; font-weight: bold;">⚠️ This is an automated security alert. If you believe this detection is incorrect, please review it in your dashboard.</p>
+        
+        <div class="footer">
+            <p>&copy; 2025 {{ app_name }}. All rights reserved.</p>
+            <p>This email was sent to {{ user_name }} as part of our security monitoring service.</p>
+        </div>
+    </div>
+</body>
+</html>

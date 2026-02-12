@@ -1,0 +1,8 @@
+/* RegisterPage.css */
+
+/* Reusing 'LoginPage.css' for consistent premium theme.
+   Specific overrides can go here if needed. */
+
+.register-main {
+    /* Legacy override if needed, but we are using .login-page-wrapper now */
+}

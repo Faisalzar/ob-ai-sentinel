@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFA Backup Codes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+        }
+        .header {
+            text-align: center;
+            color: #16a34a;
+            margin-bottom: 30px;
+        }
+        .codes-container {
+            background-color: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .code {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px;
+            margin: 5px 0;
+            background-color: white;
+            border-radius: 4px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ app_name }}</h1>
+            <h2>🔐 Two-Factor Authentication Enabled</h2>
+        </div>
+        
+        <p>Hello {{ user_name }},</p>
+        
+        <p>Congratulations! You've successfully enabled two-factor authentication (MFA) on your account.</p>
+        
+        <h3>📋 Your Backup Codes</h3>
+        <p>Save these backup codes in a secure location. Each code can be used once if you lose access to your authenticator app:</p>
+        
+        <div class="codes-container">
+            {% for code in backup_codes %}
+            <div class="code">{{ code }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="warning">
+            <p><strong>⚠️ Important Security Tips:</strong></p>
+            <ul>
+                <li><strong>Store these codes securely</strong> - Print them or save them in a password manager</li>
+                <li><strong>Each code can only be used once</strong></li>
+                <li><strong>Don't share these codes</strong> with anyone</li>
+                <li><strong>If you lose access</strong> to your authenticator app, use these codes to log in</li>
+            </ul>
+        </div>
+        
+        <p>Your account is now more secure with two-factor authentication enabled!</p>
+        
+        <div class="footer">
+            <p>&copy; 2025 {{ app_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

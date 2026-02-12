@@ -1,0 +1,20 @@
+.theme-dark {
+  --bg-main: #050711;
+  --bg-elevated: #0b1020;
+  --text-main: #e2e8f0;
+}
+
+.theme-light {
+  --bg-main: #f9fafb;
+  --bg-elevated: #ffffff;
+  --text-main: #020617;
+}
+
+.app-root {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+.card {
+  background-color: var(--bg-elevated);
+}

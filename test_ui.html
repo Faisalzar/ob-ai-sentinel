@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.online {
+            background: #4ade80;
+            color: white;
+        }
+        
+        .status.offline {
+            background: #f87171;
+            color: white;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        
+        .section h2 {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f3f4f6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .response.success {
+            background: #d1fae5;
+            border-left: 4px solid #4ade80;
+        }
+        
+        .response.error {
+            background: #fee2e2;
+            border-left: 4px solid #f87171;
+        }
+        
+        .response pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .token-display {
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .quick-action {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-action:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .quick-action h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .quick-action p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Backend API Tester
+            <span class="status" id="serverStatus">Checking...</span>
+        </h1>
+        <p class="subtitle">Test your FastAPI backend endpoints without using curl or Postman</p>
+        
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>⚡ Quick Actions</h2>
+            <div class="grid">
+                <div class="quick-action" onclick="checkHealth()">
+                    <h3>🏥 Health Check</h3>
+                    <p>Test if the server is running</p>
+                </div>
+                <div class="quick-action" onclick="showSection('auth')">
+                    <h3>🔐 Authentication</h3>
+                    <p>Register and login users</p>
+                </div>
+                <div class="quick-action" onclick="showSection('user')">
+                    <h3>👤 User Operations</h3>
+                    <p>Get user info and stats</p>
+                </div>
+                <div class="quick-action" onclick="window.open('http://localhost:8000/docs', '_blank')">
+                    <h3>📚 API Docs</h3>
+                    <p>Open Swagger documentation</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Authentication Section -->
+        <div class="section" id="authSection" style="display: none;">
+            <h2>🔐 Authentication</h2>
+            
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="regName" placeholder="Test User" value="Test User">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="test@example.com" value="test@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Password123!" value="TestPassword123!">
+            </div>
+            
+            <button onclick="registerUser()">Register User</button>
+            <button onclick="loginUser()">Login User</button>
+            
+            <div id="authResponse" class="response" style="display: none;"></div>
+            
+            <div id="tokenDisplay" class="token-display" style="display: none;">
+                <strong>Access Token:</strong><br>
+                <span id="tokenValue"></span>
+            </div>
+        </div>
+        
+        <!-- User Operations Section -->
+        <div class="section" id="userSection" style="display: none;">
+            <h2>👤 User Operations</h2>
+            
+            <button onclick="getCurrentUser()">Get Current User</button>
+            <button onclick="getUserStats()">Get User Stats</button>
+            
+            <div id="userResponse" class="response" style="display: none;"></div>
+        </div>
+        
+        <!-- Response Area -->
+        <div class="section">
+            <h2>📋 Recent Response</h2>
+            <div id="mainResponse" class="response">
+                <pre>No requests yet. Click on any action above to get started!</pre>
+            </div>
+        </div>
+        
+        <!-- Endpoints List -->
+        <div class="section">
+            <h2>📡 Available Endpoints</h2>
+            <ul style="line-height: 2; color: #374151;">
+                <li><strong>GET</strong> /api/v1/health - Health check</li>
+                <li><strong>POST</strong> /api/v1/auth/register - Register user</li>
+                <li><strong>POST</strong> /api/v1/auth/login - Login user</li>
+                <li><strong>GET</strong> /api/v1/auth/me - Get current user</li>
+                <li><strong>GET</strong> /api/v1/user/stats - Get user statistics</li>
+                <li><strong>POST</strong> /api/v1/detect/image - Upload and detect objects in image</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        let accessToken = '';
+        
+        // Check server status on load
+        window.onload = function() {
+            checkHealth();
+        };
+        
+        function showSection(section) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'none';
+            
+            if (section === 'auth') {
+                document.getElementById('authSection').style.display = 'block';
+            } else if (section === 'user') {
+                document.getElementById('userSection').style.display = 'block';
+            }
+        }
+        
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                document.getElementById('serverStatus').textContent = 'Online';
+                document.getElementById('serverStatus').className = 'status online';
+                
+                displayResponse('mainResponse', data, true);
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = 'Offline';
+                document.getElementById('serverStatus').className = 'status offline';
+                
+                displayResponse('mainResponse', { error: 'Server is not running. Please start with: python main.py' }, false);
+            }
+        }
+        
+        async function registerUser() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                const success = response.ok;
+                
+                displayResponse('authResponse', data, success);
+                displayResponse('mainResponse', data, success);
+            } catch (error) {
+                displayResponse('authResponse', { error: error.message }, false);
+            }
+        }
+        
+        async function loginUser() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                const success = response.ok;
+                
+                if (success && data.access_token) {
+                    accessToken = data.access_token;
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    document.getElementById('tokenValue').textContent = accessToken.substring(0, 100) + '...';
+                }
+                
+                displayResponse('authResponse', data, success);
+                displayResponse('mainResponse', data, success);
+            } catch (error) {
+                displayResponse('authResponse', { error: error.message }, false);
+            }
+        }
+        
+        async function getCurrentUser() {
+            if (!accessToken) {
+                alert('Please login first to get an access token!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                const success = response.ok;
+                
+                displayResponse('userResponse', data, success);
+                displayResponse('mainResponse', data, success);
+            } catch (error) {
+                displayResponse('userResponse', { error: error.message }, false);
+            }
+        }
+        
+        async function getUserStats() {
+            if (!accessToken) {
+                alert('Please login first to get an access token!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/user/stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                const success = response.ok;
+                
+                displayResponse('userResponse', data, success);
+                displayResponse('mainResponse', data, success);
+            } catch (error) {
+                displayResponse('userResponse', { error: error.message }, false);
+            }
+        }
+        
+        function displayResponse(elementId, data, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = 'response ' + (isSuccess ? 'success' : 'error');
+            element.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+    </script>
+</body>
+</html>
