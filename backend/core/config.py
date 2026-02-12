@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str
     SMTP_PASSWORD: str
-    FROM_Email: str
+    FROM_EMAIL: str
     FROM_NAME: str = "Ob AI Sentinel"
     
     # Brevo Email API (HTTP) - Bypass Blocking
