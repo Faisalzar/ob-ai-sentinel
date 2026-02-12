@@ -5,9 +5,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
-from ultralytics import YOLO
 import logging
-import torch
 
 from backend.core.config import settings, get_threat_level, DANGEROUS_CLASSES
 
@@ -29,6 +27,9 @@ class AIDetectionService:
     def _initialize_model(self):
         """Load YOLOv8 model on first instantiation"""
         try:
+            from ultralytics import YOLO
+            import torch
+            
             model_path = Path(settings.MODEL_PATH)
             if not model_path.exists():
                 raise FileNotFoundError(f"Model not found at {model_path}")

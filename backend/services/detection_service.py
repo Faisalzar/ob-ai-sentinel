@@ -7,7 +7,6 @@ from typing import List, Dict, Any, Tuple
 import numpy as np
 
 from backend.core.config import settings
-from backend.services.ai_service import AIDetectionService
 from backend.services.multi_model_service import create_multi_model_service
 
 logger = logging.getLogger(__name__)
@@ -30,6 +29,7 @@ class DetectionService:
         else:
             # Priority 2: Fall back to YOLOv8 (local)
             logger.info("Roboflow not configured - using YOLOv8 detection service (local)")
+            from backend.services.ai_service import AIDetectionService
             self.service = AIDetectionService()
             self.mode = "yolov8"
         
