@@ -3,7 +3,7 @@ let API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 // 1. Explicit Fallback for Production (if env var fails)
 if (!API_BASE_URL && window.location.hostname.includes('vercel.app')) {
-    API_BASE_URL = 'https://ob-ai-sentinel.onrender.com/api/v1';
+    API_BASE_URL = 'https://ob-ai-backend.onrender.com/api/v1';
 }
 
 // 2. Default to Localhost

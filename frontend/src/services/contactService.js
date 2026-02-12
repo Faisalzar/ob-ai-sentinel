@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api/v1'; // Adjust if your base URL is different
+import api from './api';
 
 /**
  * Send a contact message to the backend
@@ -7,24 +7,8 @@ const API_URL = 'http://localhost:8000/api/v1'; // Adjust if your base URL is di
  */
 export const sendContactMessage = async (data) => {
     try {
-        const response = await fetch(`${API_URL}/contact`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw result;
-        }
-
-        return result;
+        return await api.post('/contact', data);
     } catch (error) {
-        // If the error is from the backend (result), it's thrown as an object.
-        // If it's a network error, it might be a standard Error object.
-        throw error.detail ? error : { detail: error.message || 'Network error' };
+        throw error;
     }
 };
