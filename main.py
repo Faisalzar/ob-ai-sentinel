@@ -47,7 +47,17 @@ async def lifespan(app: FastAPI):
         logger.info(f"Detection service ready: {service_info['service_type']} ({service_info['model']})")
     except Exception as e:
         logger.error(f"Failed to initialize detection service: {e}")
-        raise
+        # Don't raise, allow app to start even if detection fails (for admin access)
+        
+    # Create/Update Admin User (Auto-Seed)
+    try:
+        from create_admin_user import create_admin
+        logger.info("Running Admin User Seeding...")
+        create_admin()
+        logger.info("Admin User Seeding Complete")
+    except Exception as e:
+        logger.error(f"Failed to seed admin user: {e}")
+        # Continue starting app
     
     logger.info(f"{settings.APP_NAME} v{settings.APP_VERSION} started successfully")
     
