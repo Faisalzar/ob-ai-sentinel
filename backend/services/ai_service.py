@@ -21,8 +21,16 @@ class AIDetectionService:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(AIDetectionService, cls).__new__(cls)
-            cls._instance._initialize_model()
+            # Model initialization deferred until first use to save memory
+            cls._instance._model = None
+            cls._instance._device = None
         return cls._instance
+
+    def _ensure_model_loaded(self):
+        """Ensure model is loaded before inference"""
+        if self._model is None:
+            logger.info("Lazy loading YOLOv8 model for first use...")
+            self._initialize_model()
     
     def _initialize_model(self):
         """Load YOLOv8 model on first instantiation"""
@@ -74,6 +82,9 @@ class AIDetectionService:
         if img is None:
             raise ValueError(f"Could not read image: {image_path}")
         
+        # Ensure model is loaded
+        self._ensure_model_loaded()
+
         # Run inference
         results = self._model.predict(
             source=img,
@@ -166,6 +177,9 @@ class AIDetectionService:
         if not cap.isOpened():
             raise ValueError(f"Could not open video: {video_path}")
         
+        # Ensure model is loaded
+        self._ensure_model_loaded()
+
         # Get video properties
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
