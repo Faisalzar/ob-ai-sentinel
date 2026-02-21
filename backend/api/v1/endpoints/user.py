@@ -280,6 +280,8 @@ async def detect_image(
         )
         
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         upload.processing_error = str(e)
         try:
             db.commit()
@@ -287,7 +289,7 @@ async def detect_image(
             db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Detection failed: {str(e)}"
+            detail=f"Detection failed: {str(e)}\n\nTraceback:\n{error_details}"
         )
 
 
