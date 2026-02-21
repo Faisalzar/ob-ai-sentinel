@@ -17,10 +17,10 @@ pyotp==2.9.0
 qrcode==7.4.2
 
 # AI/ML
-ultralytics==8.1.11
-torch==2.1.2
-torchvision==0.16.2
-opencv-python==4.9.0.80
+# ultralytics==8.1.11  # (Commented out: Causes Render 512MB RAM crash. Using Roboflow cloud instead)
+# torch==2.1.2         # (Commented out: Causes Render 512MB RAM crash. Using Roboflow cloud instead)
+# torchvision==0.16.2  # (Commented out: Causes Render 512MB RAM crash. Using Roboflow cloud instead)
+opencv-python-headless==4.9.0.80  # (Use headless versions on servers to save memory)
 numpy==1.26.3
 pillow==10.2.0
 
@@ -35,9 +35,10 @@ pyyaml==6.0.1
 aiosmtplib==3.0.1
 jinja2==3.1.3
 
-# Storage (S3)
+# Storage (S3 / Cloudinary)
 boto3==1.34.25
 botocore==1.34.25
+cloudinary==1.44.1
 
 # Redis & Celery
 redis==5.0.1

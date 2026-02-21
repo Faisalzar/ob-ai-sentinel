@@ -54,6 +54,11 @@ class Settings(BaseSettings):
     AWS_REGION: str = "us-east-1"
     AWS_BUCKET_NAME: Optional[str] = None
     
+    # Cloudinary Storage
+    CLOUDINARY_CLOUD_NAME: Optional[str] = None
+    CLOUDINARY_API_KEY: Optional[str] = None
+    CLOUDINARY_API_SECRET: Optional[str] = None
+    
     # AI Model (auto-detects: Roboflow first, then YOLOv8 fallback)
     MODEL_MODE: str = "auto"  # auto, yolov8, or roboflow
     MODEL_PATH: str = "ai/models/best.pt"
