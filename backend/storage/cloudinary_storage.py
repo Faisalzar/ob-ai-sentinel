@@ -53,14 +53,12 @@ class CloudinaryStorage(StorageInterface):
         import os
         name, _ = os.path.splitext(public_id)
 
-        # Prepend the unique project folder
-        public_id = f"ob_ai_sentinel_evidence/{name}"
-
         try:
-            # Upload to Cloudinary
+            # Upload to Cloudinary, explicitly creating the folder
             response = cloudinary.uploader.upload(
                 body, 
-                public_id=public_id,
+                public_id=name,
+                folder="ob_ai_sentinel_evidence",
                 resource_type=resource_type,
                 overwrite=True
             )
