@@ -219,8 +219,32 @@ async def detect_image(
     db.refresh(upload)
     
     try:
+        # If saved_path is a URL (Cloudinary), download it to a temporary file first
+        is_remote = saved_path.startswith("http://") or saved_path.startswith("https://")
+        inference_path = saved_path
+        
+        if is_remote:
+            import requests
+            import tempfile
+            response = requests.get(saved_path)
+            if response.status_code == 200:
+                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_ext)
+                temp_file.write(response.content)
+                temp_file.close()
+                inference_path = temp_file.name
+            else:
+                raise Exception(f"Failed to download image from storage: {response.status_code}")
+
         # Run detection
-        detections, annotated_img = detection_service.detect_image(saved_path)
+        detections, annotated_img = detection_service.detect_image(inference_path)
+        
+        # Clean up temp file if remote
+        if is_remote:
+            import os
+            try:
+                os.remove(inference_path)
+            except Exception:
+                pass
         
         # Save annotated image
         annotated_filename = f"{uuid.uuid4()}_annotated{file_ext}"
