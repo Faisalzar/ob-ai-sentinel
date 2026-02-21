@@ -49,6 +49,7 @@ flower==2.0.1
 slowapi==0.1.9
 
 # HTTP client
+requests==2.31.0
 httpx==0.26.0
 aiohttp==3.9.1
 aiofiles==23.2.1
