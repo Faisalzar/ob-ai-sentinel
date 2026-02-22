@@ -456,7 +456,15 @@ async def detect_video(
             upload_id=upload.id,
             filename=file.filename,
             detections=[],
-            summary=DetectionSummary(objects_detected=0, dangerous_objects=0, total_confidence=0),
+            summary=DetectionSummary(
+                total_detections=0,
+                dangerous_count=0,
+                caution_count=0,
+                harmless_count=0,
+                classes_detected=[],
+                has_dangerous_objects=False,
+                dangerous_objects=[]
+            ),
             annotated_url="",
             warnings=["Video is being processed asynchronously. Results will appear in history soon."]
         )
