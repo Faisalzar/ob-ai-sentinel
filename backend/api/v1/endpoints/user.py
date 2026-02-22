@@ -350,28 +350,35 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = str(output_dir / output_filename)
         
-        # Run detection
-        # OpenCV might output a non-playable MP4 depending on the system's codecs
-        temp_output_path = output_path.replace(".mp4", "_cv2.mp4")
-        detections = detection_service.detect_video(inference_path, temp_output_path)
+        import asyncio
+        import os
         
-        # Force strict web-compatible transcode using FFmpeg
-        try:
-            subprocess.run([
-                "ffmpeg", "-y", "-i", temp_output_path,
-                "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                "-profile:v", "baseline", "-level", "3.0",
-                "-movflags", "+faststart",
-                output_path
-            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            # Remove the unplayable OpenCV output
-            if os.path.exists(temp_output_path):
-                os.remove(temp_output_path)
-        except Exception as ffmpeg_err:
-            logger.error(f"FFmpeg transcode failed, falling back to basic cv2 output: {ffmpeg_err}")
-            # If FFmpeg is missing or fails, just fallback to whatever OpenCV produced
-            if os.path.exists(temp_output_path):
-                shutil.move(temp_output_path, output_path)
+        def run_video_processing():
+            temp_output_path = output_path.replace(".mp4", "_cv2.mp4")
+            # Run detection
+            dets = detection_service.detect_video(inference_path, temp_output_path)
+            
+            # Force strict web-compatible transcode using FFmpeg
+            try:
+                subprocess.run([
+                    "ffmpeg", "-y", "-i", temp_output_path,
+                    "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
+                    "-profile:v", "baseline", "-level", "3.0",
+                    "-movflags", "+faststart",
+                    output_path
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                # Remove the unplayable OpenCV output
+                if os.path.exists(temp_output_path):
+                    os.remove(temp_output_path)
+            except Exception as ffmpeg_err:
+                logger.error(f"FFmpeg transcode failed, falling back to basic cv2 output: {ffmpeg_err}")
+                # If FFmpeg is missing or fails, just fallback to whatever OpenCV produced
+                if os.path.exists(temp_output_path):
+                    shutil.move(temp_output_path, output_path)
+            return dets
+
+        # Execute blocking video processing in a separate thread to prevent event loop blocking
+        detections = await asyncio.to_thread(run_video_processing)
         
         # Clean up temp file if remote
         if is_remote:

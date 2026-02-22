@@ -602,7 +602,7 @@ class MultiModelRoboflowService:
         
         all_detections = []
         frame_count = 0
-        frame_skip = max(1, fps // 2)  # Process 2 frames per second
+        frame_skip = max(1, fps)  # Process 1 frame per second (halves processing time)
         
         try:
             while True:
