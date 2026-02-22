@@ -320,6 +320,8 @@ async def detect_image(
 async def process_video_background(upload_id: str, video_path: str, user_id: str):
     """Background task for video processing without Celery"""
     from backend.db.base import SessionLocal
+    import subprocess
+    import shutil
     db = SessionLocal()
     try:
         upload = db.query(Upload).filter(Upload.id == upload_id).first()
@@ -349,7 +351,27 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
         output_path = str(output_dir / output_filename)
         
         # Run detection
-        detections = detection_service.detect_video(inference_path, output_path)
+        # OpenCV might output a non-playable MP4 depending on the system's codecs
+        temp_output_path = output_path.replace(".mp4", "_cv2.mp4")
+        detections = detection_service.detect_video(inference_path, temp_output_path)
+        
+        # Force strict web-compatible transcode using FFmpeg
+        try:
+            subprocess.run([
+                "ffmpeg", "-y", "-i", temp_output_path,
+                "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                "-profile:v", "baseline", "-level", "3.0",
+                "-movflags", "+faststart",
+                output_path
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Remove the unplayable OpenCV output
+            if os.path.exists(temp_output_path):
+                os.remove(temp_output_path)
+        except Exception as ffmpeg_err:
+            logger.error(f"FFmpeg transcode failed, falling back to basic cv2 output: {ffmpeg_err}")
+            # If FFmpeg is missing or fails, just fallback to whatever OpenCV produced
+            if os.path.exists(temp_output_path):
+                shutil.move(temp_output_path, output_path)
         
         # Clean up temp file if remote
         if is_remote:
