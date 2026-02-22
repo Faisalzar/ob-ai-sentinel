@@ -1,7 +1,7 @@
 """
 User API endpoints - Detection and uploads
 """
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, BackgroundTasks
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -317,16 +317,95 @@ async def detect_image(
         )
 
 
+async def process_video_background(upload_id: str, video_path: str, user_id: str):
+    """Background task for video processing without Celery"""
+    from backend.db.base import SessionLocal
+    db = SessionLocal()
+    try:
+        upload = db.query(Upload).filter(Upload.id == upload_id).first()
+        if not upload:
+            return
+            
+        # Download from Cloudinary if needed
+        is_remote = video_path.startswith("http://") or video_path.startswith("https://")
+        inference_path = video_path
+        
+        if is_remote:
+            import requests
+            import tempfile
+            response = requests.get(video_path)
+            if response.status_code == 200:
+                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+                temp_file.write(response.content)
+                temp_file.close()
+                inference_path = temp_file.name
+            else:
+                raise Exception(f"Failed to download video: {response.status_code}")
+                
+        # Generate output path
+        output_filename = f"{uuid.uuid4()}_annotated.mp4"
+        output_dir = Path(settings.LOCAL_OUTPUT_PATH) / f"user_{user_id}"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = str(output_dir / output_filename)
+        
+        # Run detection
+        detections = detection_service.detect_video(inference_path, output_path)
+        
+        # Clean up temp file if remote
+        if is_remote:
+            import os
+            try:
+                os.remove(inference_path)
+            except Exception:
+                pass
+                
+        # Save detections to database
+        warnings = []
+        for det in detections:
+            detection_record = Detection(
+                upload_id=upload.id,
+                class_name=det["class_name"],
+                confidence=det["confidence"],
+                bbox=det["bbox"],
+                threat_level=ThreatLevel(det["threat_level"])
+            )
+            db.add(detection_record)
+            
+            # Create alert for dangerous objects
+            if det["threat_level"] == "dangerous":
+                await save_alert(db, upload.user_id, upload.id, det, output_path)
+                warnings.append(f"⚠️ DANGEROUS: {det['class_name']} detected")
+                
+        # Get summary
+        summary = detection_service.get_detection_summary(detections)
+        
+        # Update upload record
+        upload.detection_summary = summary
+        upload.annotated_path = output_path
+        upload.is_processed = True
+        upload.processed_at = datetime.utcnow()
+        
+        db.commit()
+    except Exception as e:
+        if 'upload' in locals() and upload:
+            upload.processing_error = str(e)
+            try:
+                db.commit()
+            except:
+                db.rollback()
+    finally:
+        db.close()
+
 @router.post("/detect/video", response_model=DetectionResponse)
 async def detect_video(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
     """
-    Detect objects in uploaded video (Async)
+    Detect objects in uploaded video (Async using BackgroundTasks)
     """
-    from backend.tasks.detection_tasks import process_video_async
     
     # Get system settings
     settings_obj = db.query(SystemSettings).filter(SystemSettings.id == 1).first()
@@ -371,7 +450,7 @@ async def detect_video(
     
     # Start async task
     try:
-        process_video_async.delay(str(upload.id), saved_path, str(current_user.id))
+        background_tasks.add_task(process_video_background, str(upload.id), saved_path, str(current_user.id))
         
         return DetectionResponse(
             upload_id=upload.id,
