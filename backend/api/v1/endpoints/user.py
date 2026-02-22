@@ -1,8 +1,8 @@
 """
 User API endpoints - Detection and uploads
 """
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, BackgroundTasks, Request
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import uuid
@@ -598,30 +598,80 @@ async def delete_upload(
 @router.get("/outputs/{file_path:path}")
 async def serve_output_file(
     file_path: str,
+    request: Request,
     current_user: User = Depends(get_current_active_user)
 ):
     """
-    Serve annotated output files
+    Serve annotated output files (with Range request support for videos)
     Only users can access their own files
     """
-    # Ensure user can only access their own files
     expected_prefix = f"user_{current_user.id}/"
-    print(f"File path requested: {file_path}")
-    print(f"Expected prefix: {expected_prefix}")
-    print(f"User ID: {current_user.id}")
-    
     if not file_path.startswith(expected_prefix):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     full_path = Path(settings.LOCAL_OUTPUT_PATH) / file_path
-    
     if not full_path.exists() or not full_path.is_file():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="File not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+        
+    is_video = str(full_path).lower().endswith(".mp4")
     
-    return FileResponse(full_path)
+    if not is_video:
+        return FileResponse(full_path)
+        
+    # Handle video streaming with Range requests
+    file_size = full_path.stat().st_size
+    range_header = request.headers.get('Range')
+    
+    if range_header:
+        byte1, byte2 = 0, None
+        match = re.search(r'(\d+)-(\d*)', range_header)
+        g = match.groups()
+        if g[0]: byte1 = int(g[0])
+        if g[1]: byte2 = int(g[1])
+
+        length = file_size - byte1
+        if byte2 is not None:
+            length = byte2 + 1 - byte1
+
+        def file_iterator(path, offset, bytes_to_read):
+            with open(path, 'rb') as f:
+                f.seek(offset)
+                chunk_size = 8192
+                while bytes_to_read > 0:
+                    read_size = min(chunk_size, bytes_to_read)
+                    data = f.read(read_size)
+                    if not data:
+                        break
+                    bytes_to_read -= len(data)
+                    yield data
+
+        headers = {
+            'Content-Range': f'bytes {byte1}-{byte1 + length - 1}/{file_size}',
+            'Accept-Ranges': 'bytes',
+            'Content-Length': str(length),
+        }
+        return StreamingResponse(
+            file_iterator(full_path, byte1, length),
+            status_code=206,
+            headers=headers,
+            media_type="video/mp4"
+        )
+    else:
+        headers = {
+            'Accept-Ranges': 'bytes',
+            'Content-Length': str(file_size),
+        }
+        def file_iterator(path):
+            with open(path, 'rb') as f:
+                chunk_size = 8192
+                while True:
+                    data = f.read(chunk_size)
+                    if not data:
+                        break
+                    yield data
+                    
+        return StreamingResponse(
+            file_iterator(full_path),
+            headers=headers,
+            media_type="video/mp4"
+        )
