@@ -12,6 +12,8 @@ const VideoDetectPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [maxSizeMB, setMaxSizeMB] = useState(50);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [pollInterval, setPollInterval] = useState(null);
 
   React.useEffect(() => {
     const fetchSettings = async () => {
@@ -63,6 +65,11 @@ const VideoDetectPage = () => {
 
       const data = await api.uploadFile('/detect/video', formData);
       setResult(data);
+
+      if (data.upload_id) {
+        setIsProcessing(true);
+        startPolling(data.upload_id);
+      }
     } catch (err) {
       setError(err.message || 'Video analysis failed. Please try again.');
     } finally {
@@ -70,12 +77,55 @@ const VideoDetectPage = () => {
     }
   };
 
+  const startPolling = (uploadId) => {
+    if (pollInterval) clearInterval(pollInterval);
+
+    const interval = setInterval(async () => {
+      try {
+        const checkData = await api.get(`/uploads/${uploadId}`);
+        if (checkData.is_processed) {
+          // Processing complete!
+          clearInterval(interval);
+          setPollInterval(null);
+          setIsProcessing(false);
+
+          // Update result with final data
+          setResult(prev => ({
+            ...prev,
+            summary: checkData.detection_summary,
+            annotated_url: checkData.annotated_path ? `/api/v1/${checkData.annotated_path}` : null,
+            warnings: []
+          }));
+        } else if (checkData.processing_error) {
+          clearInterval(interval);
+          setPollInterval(null);
+          setIsProcessing(false);
+          setError(`Processing failed: ${checkData.processing_error}`);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    setPollInterval(interval);
+  };
+
   const handleReset = () => {
+    if (pollInterval) clearInterval(pollInterval);
+    setPollInterval(null);
+    setIsProcessing(false);
     setFile(null);
     setPreviewUrl(null);
     setResult(null);
     setError('');
   };
+
+  // Cleanup polling on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [pollInterval]);
 
   return (
     <div className="id-page-container">
@@ -138,10 +188,17 @@ const VideoDetectPage = () => {
           </Dropzone>
 
           {/* Actions */}
-          {loading ? (
-            <div className="id-loading">
-              <div className="id-spinner"></div>
-              <div className="id-loading-text">Analyzing video frame by frame...</div>
+          {loading || isProcessing ? (
+            <div className="id-loading text-center p-8">
+              <div className="id-spinner mx-auto mb-4"></div>
+              <div className="id-loading-text text-lg text-purple-300">
+                {loading ? "Uploading video..." : "Analyzing video... This may take a few minutes."}
+              </div>
+              {isProcessing && (
+                <p className="text-zinc-400 text-sm mt-2">
+                  Please keep this page open. We are analyzing the video frame by frame.
+                </p>
+              )}
             </div>
           ) : (
             <div className="id-actions p-4">
@@ -178,13 +235,66 @@ const VideoDetectPage = () => {
         </section>
 
         {/* Results Section */}
-        {result && (
+        {result && !isProcessing && (
           <aside className="id-card">
-            <div className="id-results-header">
-              <span className="id-results-title">Analysis Results</span>
+            <div className="id-results-header mb-4 border-b border-zinc-800 pb-2">
+              <h2 className="text-xl font-bold text-white">Analysis Results</h2>
             </div>
-            <div className="p-4 overflow-auto max-h-[500px] text-xs font-mono bg-zinc-950/50 rounded-lg border border-zinc-800 text-zinc-300">
-              <pre>{JSON.stringify(result, null, 2)}</pre>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">
+                  <h3 className="text-sm text-zinc-400 uppercase tracking-wider mb-2">Summary</h3>
+                  <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
+                    <span className="text-zinc-300">Total Objects Detected</span>
+                    <span className="font-mono text-white bg-zinc-800 px-2 py-1 rounded">{result.summary?.total_detections || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
+                    <span className="text-zinc-300">Dangerous Objects</span>
+                    <span className={`font-mono px-2 py-1 rounded ${result.summary?.dangerous_count > 0 ? 'bg-red-500/20 text-red-400' : 'bg-zinc-800 text-white'}`}>
+                      {result.summary?.dangerous_count || 0}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-zinc-300">Unique Classes</span>
+                    <span className="font-mono text-white bg-zinc-800 px-2 py-1 rounded">
+                      {result.summary?.classes_detected?.length || 0}
+                    </span>
+                  </div>
+                </div>
+
+                {result.summary?.classes_detected?.length > 0 && (
+                  <div className="bg-zinc-900/50 p-4 rounded-lg border border-zinc-800">
+                    <h3 className="text-sm text-zinc-400 uppercase tracking-wider mb-2">Detected Classes</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {result.summary.classes_detected.map(cls => (
+                        <span key={cls} className="text-xs bg-zinc-800 text-zinc-300 px-2 py-1 rounded-full border border-zinc-700">
+                          {cls}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h3 className="text-sm text-zinc-400 uppercase tracking-wider mb-2">Annotated Video</h3>
+                {result.annotated_url ? (
+                  <div className="rounded-lg overflow-hidden border border-zinc-800 shadow-lg shadow-purple-900/20">
+                    <video
+                      src={import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}${result.annotated_url}` : result.annotated_url}
+                      controls
+                      autoPlay
+                      loop
+                      className="w-full h-auto bg-black"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-48 flex items-center justify-center bg-zinc-900/50 border border-zinc-800 rounded-lg text-zinc-500">
+                    No annotated video generated
+                  </div>
+                )}
+              </div>
             </div>
           </aside>
         )}
