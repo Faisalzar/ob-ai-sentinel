@@ -361,12 +361,12 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
             # Force strict web-compatible transcode using FFmpeg
             try:
                 subprocess.run([
-                    "ffmpeg", "-y", "-i", temp_output_path,
+                    "ffmpeg", "-y", "-nostdin", "-i", temp_output_path,
                     "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
                     "-profile:v", "baseline", "-level", "3.0",
                     "-movflags", "+faststart",
                     output_path
-                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
                 # Remove the unplayable OpenCV output
                 if os.path.exists(temp_output_path):
                     os.remove(temp_output_path)
