@@ -192,6 +192,14 @@ class AIDetectionService:
         all_detections = []
         frame_count = 0
         
+        # Process ~3 frames per second to speed up local analysis significantly
+        # If fps < 3, process every frame.
+        frame_skip = max(1, int(fps // 3))
+        
+        last_results_boxes = [] # Store the raw boxes logic or just the drawn annotated frame logic
+        # Actually, it's easier to store the detections and draw them again.
+        last_detections_for_frame = []
+        
         try:
             while True:
                 ret, frame = cap.read()
@@ -199,6 +207,26 @@ class AIDetectionService:
                     break
                 
                 frame_count += 1
+                
+                if frame_count % frame_skip != 0 and frame_count != 1:
+                    # Skip frame inference, just draw last detections
+                    annotated_frame = frame.copy()
+                    for det in last_detections_for_frame:
+                        x1, y1, x2, y2 = det["xyxy"]
+                        class_name = det["class_name"]
+                        confidence = det["confidence"]
+                        threat_level = det["threat_level"]
+                        
+                        color = (0, 0, 255) if threat_level == "dangerous" else \
+                                (0, 255, 255) if threat_level == "caution" else (0, 255, 0)
+                        
+                        cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+                        label = f"{class_name}: {confidence:.2f}"
+                        cv2.putText(annotated_frame, label, (int(x1), int(y1) - 10),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                    
+                    out.write(annotated_frame)
+                    continue
                 
                 # Run inference on frame
                 results = self._model.predict(
@@ -210,6 +238,7 @@ class AIDetectionService:
                 )
                 
                 annotated_frame = frame.copy()
+                last_detections_for_frame = []
                 
                 for result in results:
                     boxes = result.boxes
@@ -230,12 +259,20 @@ class AIDetectionService:
                         cv2.putText(annotated_frame, label, (int(x1), int(y1) - 10),
                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
                         
-                        # Store detection
+                        # Store detection for final summary
                         all_detections.append({
                             "frame": frame_count,
                             "class_name": class_name,
                             "confidence": f"{confidence:.4f}",
                             "bbox": {"x1": float(x1), "y1": float(y1), "x2": float(x2), "y2": float(y2)},
+                            "threat_level": threat_level
+                        })
+                        
+                        # Store for skipped frames
+                        last_detections_for_frame.append({
+                            "xyxy": (float(x1), float(y1), float(x2), float(y2)),
+                            "class_name": class_name,
+                            "confidence": confidence,
                             "threat_level": threat_level
                         })
                 

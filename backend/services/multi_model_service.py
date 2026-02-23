@@ -604,6 +604,8 @@ class MultiModelRoboflowService:
         frame_count = 0
         frame_skip = max(1, fps)  # Process 1 frame per second (halves processing time)
         
+        last_detections_for_frame = []
+        
         try:
             while True:
                 ret, frame = cap.read()
@@ -612,8 +614,9 @@ class MultiModelRoboflowService:
                 
                 frame_count += 1
                 
-                if frame_count % frame_skip != 0:
-                    out.write(frame)
+                if frame_count % frame_skip != 0 and frame_count != 1:
+                    annotated_frame = self._annotate_image(frame, last_detections_for_frame)
+                    out.write(annotated_frame)
                     continue
                 
                 # Save frame temporarily
@@ -623,6 +626,8 @@ class MultiModelRoboflowService:
                 try:
                     detections, annotated_frame = self.detect_image(temp_frame_path)
                     
+                    last_detections_for_frame = detections
+                    
                     for detection in detections:
                         detection['frame'] = frame_count
                         all_detections.append(detection)
@@ -631,7 +636,8 @@ class MultiModelRoboflowService:
                     
                 except Exception as e:
                     logger.error(f"Error processing frame {frame_count}: {e}")
-                    out.write(frame)
+                    annotated_frame = self._annotate_image(frame, last_detections_for_frame)
+                    out.write(annotated_frame)
                 
                 finally:
                     Path(temp_frame_path).unlink(missing_ok=True)
