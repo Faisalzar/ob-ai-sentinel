@@ -106,9 +106,33 @@ def process_video_async(self, upload_id: str, video_path: str, user_id: str):
         # Get summary
         summary = detection_service.get_detection_summary(detections)
         
+        # Upload to Storage
+        from backend.storage.storage_factory import storage
+        import asyncio
+        import os
+        
+        if os.path.exists(output_path):
+            with open(output_path, 'rb') as f:
+                video_data = f.read()
+            # Celery is sync, so we need asyncio.run
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            
+            remote_url = loop.run_until_complete(storage.save_file(video_data, f"user_{user_id}/{output_filename}"))
+            upload.annotated_path = remote_url
+            
+            try:
+                os.remove(output_path)
+            except:
+                pass
+        else:
+            upload.annotated_path = output_path
+        
         # Update upload record
         upload.detection_summary = summary
-        upload.annotated_path = output_path
         upload.is_processed = True
         upload.processed_at = datetime.utcnow()
         

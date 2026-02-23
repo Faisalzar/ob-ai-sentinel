@@ -141,7 +141,10 @@ const AdminUploadsPage = () => {
   const helperGetPreviewUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    return `${API_BASE_URL.replace('/api/v1', '')}/${path}`;
+    const cleanPath = path.replace(/\\/g, '/');
+    const parts = cleanPath.split('outputs/');
+    const relative = `outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
+    return API_BASE_URL ? `${API_BASE_URL}/${relative}` : `/api/v1/${relative}`;
   };
 
   return (

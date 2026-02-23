@@ -408,9 +408,25 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
         # Get summary
         summary = detection_service.get_detection_summary(detections)
         
+        # Upload to Storage
+        from backend.storage.storage_factory import storage
+        import os
+        
+        if os.path.exists(output_path):
+            with open(output_path, 'rb') as f:
+                video_data = f.read()
+            remote_url = await storage.save_file(video_data, f"user_{user_id}/{output_filename}")
+            upload.annotated_path = remote_url
+            
+            try:
+                os.remove(output_path)
+            except:
+                pass
+        else:
+            upload.annotated_path = output_path
+        
         # Update upload record
         upload.detection_summary = summary
-        upload.annotated_path = output_path
         upload.is_processed = True
         upload.processed_at = datetime.utcnow()
         

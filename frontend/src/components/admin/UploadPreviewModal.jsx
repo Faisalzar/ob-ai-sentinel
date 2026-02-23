@@ -10,7 +10,9 @@ export const UploadPreviewModal = ({ upload, onClose }) => {
         if (!path) return null;
         if (path.startsWith('http')) return path;
         const cleanPath = path.replace(/\\/g, '/');
-        return `${API_BASE_URL.replace('/api/v1', '')}/${cleanPath}`;
+        const parts = cleanPath.split('outputs/');
+        const relative = `outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
+        return API_BASE_URL ? `${API_BASE_URL}/${relative}` : `/api/v1/${relative}`;
     };
 
     const getStatusColor = () => {

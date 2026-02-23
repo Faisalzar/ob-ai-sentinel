@@ -55,6 +55,14 @@ const HistoryPage = () => {
     return summary[`${level}_count`] || 0;
   };
 
+  const getPreviewUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const cleanPath = path.replace(/\\/g, '/');
+    const parts = cleanPath.split('outputs/');
+    return `/api/v1/outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
+  };
+
   return (
     <div className="id-page-container">
       {/* Advanced Target Cursor */}
@@ -190,7 +198,7 @@ const HistoryPage = () => {
                       className="cursor-target w-full h-full cursor-pointer overflow-hidden relative group/image"
                     >
                       <AuthenticatedImage
-                        src={`/api/v1/outputs/${upload.annotated_path.replace(/\\/g, '/').split('outputs/')[1]}`}
+                        src={getPreviewUrl(upload.annotated_path)}
                         alt={upload.filename}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover/image:scale-105"
                       />
@@ -257,7 +265,7 @@ const HistoryPage = () => {
 
             <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-black">
               <AuthenticatedImage
-                src={`/api/v1/outputs/${selectedUpload.annotated_path.replace(/\\/g, '/').split('outputs/')[1]}`}
+                src={getPreviewUrl(selectedUpload.annotated_path)}
                 alt={selectedUpload.filename}
                 className="max-w-full max-h-[70vh] object-contain rounded"
               />

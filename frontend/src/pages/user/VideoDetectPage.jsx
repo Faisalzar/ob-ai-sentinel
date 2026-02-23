@@ -93,7 +93,9 @@ const VideoDetectPage = () => {
           setResult(prev => ({
             ...prev,
             summary: checkData.detection_summary,
-            annotated_url: checkData.annotated_path ? `/api/v1/${checkData.annotated_path}` : null,
+            annotated_url: checkData.annotated_path
+              ? (checkData.annotated_path.startsWith('http') ? checkData.annotated_path : `/api/v1/${checkData.annotated_path}`)
+              : null,
             warnings: []
           }));
         } else if (checkData.processing_error) {
@@ -246,7 +248,7 @@ const VideoDetectPage = () => {
             <div className="relative rounded-xl overflow-hidden shadow-2xl shadow-purple-900/20 border border-zinc-800 bg-black aspect-video flex items-center justify-center max-h-[70vh]">
               {result.annotated_url ? (
                 <video
-                  src={import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}${result.annotated_url}` : result.annotated_url}
+                  src={result.annotated_url.startsWith('http') ? result.annotated_url : (import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '')}${result.annotated_url}` : result.annotated_url)}
                   controls
                   autoPlay
                   loop
