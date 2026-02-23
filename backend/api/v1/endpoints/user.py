@@ -366,7 +366,7 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
                     "-profile:v", "baseline", "-level", "3.0",
                     "-movflags", "+faststart",
                     output_path
-                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=300)
                 # Remove the unplayable OpenCV output
                 if os.path.exists(temp_output_path):
                     os.remove(temp_output_path)
