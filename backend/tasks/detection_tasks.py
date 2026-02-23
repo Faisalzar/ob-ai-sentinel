@@ -12,6 +12,9 @@ from backend.services.detection_service import detection_service
 from backend.db.base import SessionLocal
 from backend.models.models import Upload, Detection, Alert, ThreatLevel
 from backend.core.config import settings
+import subprocess
+import os
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +52,26 @@ def process_video_async(self, upload_id: str, video_path: str, user_id: str):
         
         # Run video detection
         logger.info(f"Processing video: {video_path}")
-        detections = detection_service.detect_video(video_path, output_path)
+        temp_output_path = output_path.replace(".mp4", "_cv2.mp4")
+        detections = detection_service.detect_video(video_path, temp_output_path)
+        
+        # Force strict web-compatible transcode using FFmpeg
+        try:
+            logger.info("Transcoding video to H.264 using FFmpeg...")
+            subprocess.run([
+                "ffmpeg", "-y", "-nostdin", "-i", temp_output_path,
+                "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
+                "-profile:v", "baseline", "-level", "3.0",
+                "-movflags", "+faststart",
+                output_path
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=300)
+            
+            if os.path.exists(temp_output_path):
+                os.remove(temp_output_path)
+        except Exception as ffmpeg_err:
+            logger.error(f"FFmpeg transcode failed: {ffmpeg_err}")
+            if os.path.exists(temp_output_path):
+                shutil.move(temp_output_path, output_path)
         
         # Update progress
         self.update_state(state='SAVING', meta={'progress': 80})
