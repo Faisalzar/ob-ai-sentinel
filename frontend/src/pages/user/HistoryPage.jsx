@@ -264,11 +264,20 @@ const HistoryPage = () => {
             </div>
 
             <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-black">
-              <AuthenticatedImage
-                src={getPreviewUrl(selectedUpload.annotated_path)}
-                alt={selectedUpload.filename}
-                className="max-w-full max-h-[70vh] object-contain rounded"
-              />
+              {selectedUpload.file_type === 'video' ? (
+                <video
+                  src={getPreviewUrl(selectedUpload.annotated_path || selectedUpload.file_path)}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[70vh] rounded"
+                />
+              ) : (
+                <AuthenticatedImage
+                  src={getPreviewUrl(selectedUpload.annotated_path)}
+                  alt={selectedUpload.filename}
+                  className="max-w-full max-h-[70vh] object-contain rounded"
+                />
+              )}
             </div>
 
             {selectedUpload.detection_summary && (
