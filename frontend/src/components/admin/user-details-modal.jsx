@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Activity, Shield, Monitor, Mail, Calendar, Clock, MapPin, Smartphone } from 'lucide-react';
+import { X, User, Activity, Shield, Monitor, Mail, Calendar, Clock, MapPin, Smartphone, Lock } from 'lucide-react';
 
 export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -64,8 +64,8 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                                            ? 'text-purple-400'
-                                            : 'text-zinc-400 hover:text-white'
+                                        ? 'text-purple-400'
+                                        : 'text-zinc-400 hover:text-white'
                                         }`}
                                 >
                                     <tab.icon className="h-4 w-4" />
@@ -144,9 +144,19 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
                                     />
                                     <SecurityCard
                                         title="Password"
-                                        status="Last changed 30 days ago"
-                                        statusColor="text-zinc-400"
-                                        description="Strong password policy enforced"
+                                        status="Bcrypt Encrypted Hash"
+                                        statusColor="text-purple-400"
+                                        description="Secured via one-way cryptographic hashing. Original password is mathematically impossible to recover, even by administrators."
+                                        customContent={
+                                            <div className="mt-3 w-full rounded-md bg-zinc-950 border border-zinc-800 p-3 font-mono text-xs break-all text-zinc-400 relative group">
+                                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-purple-500/5 to-transparent pointer-events-none rounded-md"></div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Lock className="h-3 w-3 text-purple-500" />
+                                                    <span className="text-[10px] uppercase tracking-wider text-purple-500 font-semibold border border-purple-500/30 rounded-sm px-1.5 py-0.5 bg-purple-500/10">Database Raw Value</span>
+                                                </div>
+                                                {user.password_hash || "No Hash Available"}
+                                            </div>
+                                        }
                                     />
                                     <SecurityCard
                                         title="Failed Login Attempts"
@@ -211,12 +221,13 @@ const InfoCard = ({ icon: Icon, label, value, valueColor = 'text-white' }) => (
     </div>
 );
 
-const SecurityCard = ({ title, status, statusColor, description }) => (
+const SecurityCard = ({ title, status, statusColor, description, customContent }) => (
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
         <div className="flex items-start justify-between mb-2">
             <h4 className="text-sm font-semibold text-white">{title}</h4>
             <span className={`text-xs font-medium ${statusColor}`}>{status}</span>
         </div>
         <p className="text-xs text-zinc-500">{description}</p>
+        {customContent}
     </div>
 );

@@ -12,6 +12,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: str
+    password_hash: Optional[str] = None
     mfa_enabled: bool
     is_active: bool
     is_verified: bool
