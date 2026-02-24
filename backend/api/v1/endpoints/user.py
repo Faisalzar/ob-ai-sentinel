@@ -248,12 +248,26 @@ async def detect_image(
         
         # Save annotated image
         annotated_filename = f"{uuid.uuid4()}_annotated{file_ext}"
-        annotated_path = f"outputs/user_{current_user.id}/{annotated_filename}"
         annotated_full_path = Path(settings.LOCAL_OUTPUT_PATH) / f"user_{current_user.id}"
         annotated_full_path.mkdir(parents=True, exist_ok=True)
         
         annotated_file_path = annotated_full_path / annotated_filename
         cv2.imwrite(str(annotated_file_path), annotated_img)
+        
+        # Upload to Storage
+        import os
+        if os.path.exists(annotated_file_path):
+            with open(annotated_file_path, 'rb') as f:
+                img_data = f.read()
+            remote_url = await storage.save_file(img_data, f"user_{current_user.id}/{annotated_filename}")
+            upload.annotated_path = remote_url
+            
+            try:
+                os.remove(annotated_file_path)
+            except:
+                pass
+        else:
+            upload.annotated_path = str(annotated_file_path)
         
         # Save detections to database
         warnings = []
@@ -299,7 +313,7 @@ async def detect_image(
             filename=file.filename,
             detections=detection_results,
             summary=DetectionSummary(**summary),
-            annotated_url=f"/api/v1/outputs/user_{current_user.id}/{annotated_filename}",
+            annotated_url=upload.annotated_path,
             warnings=warnings
         )
         

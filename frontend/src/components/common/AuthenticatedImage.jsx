@@ -4,6 +4,7 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [isBlobUrl, setIsBlobUrl] = useState(false);
 
   useEffect(() => {
     const loadImage = async () => {
@@ -32,10 +33,16 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
         }
 
         // Handle fully qualified URLs or relative paths
-        let url = src;
-        if (!src.startsWith('http')) {
-          url = `${baseUrl}${src.startsWith('/') ? '' : '/'}${src}`;
+        if (src.startsWith('http')) {
+          // Absolute URLs (like Cloudinary) bypass fetch so we don't encounter CORS errors with Authorization header
+          setImageSrc(src);
+          setIsBlobUrl(false);
+          setLoading(false);
+          return;
         }
+
+        let url = src;
+        url = `${baseUrl}${src.startsWith('/') ? '' : '/'}${src}`;
 
         console.log('Fetching image URL:', url);
         console.log('Has token:', !!token);
@@ -54,6 +61,7 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
         const blob = await response.blob();
         const objectUrl = URL.createObjectURL(blob);
         setImageSrc(objectUrl);
+        setIsBlobUrl(true);
       } catch (err) {
         console.error('Failed to load image:', err);
         setError(true);
@@ -68,7 +76,7 @@ const AuthenticatedImage = ({ src, alt, className, onClick }) => {
 
     // Cleanup object URL on unmount
     return () => {
-      if (imageSrc) {
+      if (imageSrc && isBlobUrl) {
         URL.revokeObjectURL(imageSrc);
       }
     };
