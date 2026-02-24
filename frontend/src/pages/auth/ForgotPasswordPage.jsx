@@ -265,7 +265,7 @@ const ForgotPasswordPage = () => {
                       <Lock className="input-icon" />
                       <input
                         type="password"
-                        placeholder="Must be at least 12 characters"
+                        placeholder="Must be at least 8 characters"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
@@ -273,8 +273,8 @@ const ForgotPasswordPage = () => {
                       />
                     </div>
                     {newPassword && (
-                      <div style={{ fontSize: '0.8rem', marginTop: '8px', color: newPassword.length >= 12 && /[A-Z]/.test(newPassword) && /\d/.test(newPassword) && /[^A-Za-z0-9]/.test(newPassword) ? '#4ade80' : 'var(--text-secondary)' }}>
-                        Requires: 12+ chars, uppercase, number, special char.
+                      <div style={{ fontSize: '0.8rem', marginTop: '8px', color: newPassword.length >= 8 && /[A-Z]/.test(newPassword) && /\d/.test(newPassword) && /[^A-Za-z0-9]/.test(newPassword) ? '#4ade80' : 'var(--text-secondary)' }}>
+                        Requires: 8+ chars, uppercase, number, special char.
                       </div>
                     )}
                   </div>
