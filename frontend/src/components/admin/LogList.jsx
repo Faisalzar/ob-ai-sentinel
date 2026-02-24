@@ -175,11 +175,30 @@ export const LogList = ({ logs, startIndex = 0, selectedIds = [], onSelectRow, o
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs text-zinc-500 uppercase">Meta Data</label>
-                                <div className="bg-black/50 border border-white/10 rounded-lg p-3 font-mono text-xs text-zinc-300 overflow-auto max-h-[200px]">
-                                    <pre>{JSON.stringify(selectedLog.meta, null, 2)}</pre>
-                                </div>
+                            <div className="space-y-3 mt-4 pt-4 border-t border-white/10">
+                                <label className="text-xs text-zinc-500 uppercase flex items-center gap-2">
+                                    <Activity className="h-4 w-4" />
+                                    Additional Context (Meta Data)
+                                </label>
+
+                                {(!selectedLog.meta || Object.keys(selectedLog.meta).length === 0) ? (
+                                    <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+                                        <p className="text-xs text-zinc-500">No additional metadata recorded for this action.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {Object.entries(selectedLog.meta).map(([key, value]) => (
+                                            <div key={key} className="bg-white/5 border border-white/10 rounded-lg p-3 flex flex-col gap-1">
+                                                <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">
+                                                    {key.replace(/_/g, ' ')}
+                                                </span>
+                                                <span className="text-sm font-mono text-purple-300 break-all">
+                                                    {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </motion.div>
