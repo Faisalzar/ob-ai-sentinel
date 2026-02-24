@@ -197,21 +197,26 @@ async def detect_image(
     # Generate unique filename
     file_ext = Path(file.filename).suffix
     unique_filename = f"{uuid.uuid4()}{file_ext}"
-    file_path = f"user_{current_user.id}/{unique_filename}"
     
-    # Save uploaded file
-    saved_path = await storage.save_file(file_content, file_path)
+    # Save raw file locally temporarily for inference
+    temp_dir = Path(settings.LOCAL_OUTPUT_PATH) / "temp"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    temp_raw_path = temp_dir / unique_filename
+    with open(temp_raw_path, 'wb') as f:
+        f.write(file_content)
+        
+    inference_path = str(temp_raw_path)
     
     # Determine file type
     is_live_capture = file.filename.startswith("live_capture_") or file.filename == "frame.jpg"
     upload_type = FileType.LIVE if is_live_capture else FileType.IMAGE
     
-    # Create upload record
+    # Create upload record (file_path will just be the local temp path for now, we'll update it later or it doesn't matter since we rely on annotated_path)
     upload = Upload(
         user_id=current_user.id,
         filename=file.filename,
         file_type=upload_type,
-        file_path=file_path,
+        file_path=f"user_{current_user.id}/{unique_filename}",
         file_size=len(file_content)
     )
     db.add(upload)
@@ -219,32 +224,15 @@ async def detect_image(
     db.refresh(upload)
     
     try:
-        # If saved_path is a URL (Cloudinary), download it to a temporary file first
-        is_remote = saved_path.startswith("http://") or saved_path.startswith("https://")
-        inference_path = saved_path
-        
-        if is_remote:
-            import requests
-            import tempfile
-            response = requests.get(saved_path)
-            if response.status_code == 200:
-                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=file_ext)
-                temp_file.write(response.content)
-                temp_file.close()
-                inference_path = temp_file.name
-            else:
-                raise Exception(f"Failed to download image from storage: {response.status_code}")
-
         # Run detection
         detections, annotated_img = detection_service.detect_image(inference_path)
         
-        # Clean up temp file if remote
-        if is_remote:
-            import os
-            try:
-                os.remove(inference_path)
-            except Exception:
-                pass
+        # Clean up temp file
+        import os
+        try:
+            os.remove(inference_path)
+        except Exception:
+            pass
         
         # Save annotated image
         annotated_filename = f"{uuid.uuid4()}_annotated{file_ext}"
@@ -289,9 +277,8 @@ async def detect_image(
         # Get summary
         summary = detection_service.get_detection_summary(detections)
         
-        # Update upload
+        # Update upload (annotated_path is already set above to remote_url or local fallback)
         upload.detection_summary = summary
-        upload.annotated_path = str(annotated_file_path)
         upload.is_processed = True
         upload.processed_at = datetime.utcnow()
         
