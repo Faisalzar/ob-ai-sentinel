@@ -27,7 +27,6 @@ import LiveDetectPage from './pages/user/LiveDetectPage';
 import HistoryPage from './pages/user/HistoryPage';
 import ProfileSecurityPage from './pages/user/ProfileSecurityPage';
 import NotificationsPage from './pages/user/NotificationsPage';
-import NotificationsPage from './pages/user/NotificationsPage';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
