@@ -186,11 +186,15 @@ const AdminUsersPage = () => {
   };
 
 
-  const handleSelectAll = () => {
-    if (selectedUsers.length === paginatedUsers.length) {
-      setSelectedUsers([]);
+  const handleSelectAll = (tableUsers) => {
+    if (!tableUsers || tableUsers.length === 0) return;
+    const tableUserIds = tableUsers.map(u => u.id);
+    const allSelected = tableUserIds.every(id => selectedUsers.includes(id));
+
+    if (allSelected) {
+      setSelectedUsers(prev => prev.filter(id => !tableUserIds.includes(id)));
     } else {
-      setSelectedUsers(paginatedUsers.map(u => u.id));
+      setSelectedUsers(prev => [...new Set([...prev, ...tableUserIds])]);
     }
   };
 
@@ -243,11 +247,211 @@ const AdminUsersPage = () => {
     a.click();
   };
 
-  // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  // Data Separation
+  const adminUsers = filteredUsers.filter(u => u.role === 'ADMIN');
+  const regularUsers = filteredUsers.filter(u => u.role === 'USER');
+
+  // Pagination for regular users ONLY
+  const totalPages = Math.ceil(regularUsers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  const paginatedRegularUsers = regularUsers.slice(startIndex, endIndex);
+
+  const renderTableSection = (title, Icon, displayedUsers, isPaginated) => {
+    const tableUserIds = displayedUsers.map(u => u.id);
+    const allSelected = displayedUsers.length > 0 && tableUserIds.every(id => selectedUsers.includes(id));
+
+    return (
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <Icon className={`h-5 w-5 ${title.includes('Admin') ? 'text-purple-400' : 'text-blue-400'}`} />
+          {title}
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium border ${title.includes('Admin')
+              ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+              : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+            }`}>
+            {title.includes('Admin') ? adminUsers.length : regularUsers.length}
+          </span>
+        </h2>
+
+        <div className="rounded-xl border border-white/10 bg-zinc-900/50 backdrop-blur-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b border-white/10 bg-white/5">
+                <tr>
+                  <th className="px-4 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={() => handleSelectAll(displayedUsers)}
+                      className="h-4 w-4 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500"
+                    />
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">User</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">MFA</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Verified</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Last Login</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-zinc-400">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="px-4 py-12 text-center text-zinc-500">
+                      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
+                      Loading users...
+                    </td>
+                  </tr>
+                ) : displayedUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-4 py-12 text-center text-zinc-500">
+                      No {title.toLowerCase()} found
+                    </td>
+                  </tr>
+                ) : (
+                  displayedUsers.map((user) => (
+                    <motion.tr
+                      key={user.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="group hover:bg-white/5 transition-colors cursor-pointer"
+                      onClick={() => setShowUserDetails(user)}
+                    >
+                      <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user.id)}
+                          onChange={() => handleSelectUser(user.id)}
+                          className="h-4 w-4 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500"
+                        />
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br border ${user.role === 'ADMIN'
+                              ? 'from-purple-500/20 to-purple-600/20 border-purple-500/30'
+                              : 'from-blue-500/20 to-blue-600/20 border-blue-500/30'
+                            }`}>
+                            <span className={`text-sm font-semibold ${user.role === 'ADMIN' ? 'text-purple-400' : 'text-blue-400'}`}>
+                              {user.name?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-white">{user.name}</p>
+                            <p className="text-xs text-zinc-500">{user.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
+                          {user.is_online && (
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                          )}
+                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.is_active
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            }`}>
+                            {user.is_active ? 'Active' : 'Suspended'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="text-sm text-zinc-400">{user.mfa_state || 'DISABLED'}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        {user.is_verified ? (
+                          <Check className="h-4 w-4 text-green-400" />
+                        ) : (
+                          <XIcon className="h-4 w-4 text-red-400" />
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="text-xs text-zinc-500">
+                          {user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative inline-block">
+                          <button
+                            onClick={() => setOpenDropdown(openDropdown === user.id ? null : user.id)}
+                            className="rounded-lg p-2 text-zinc-400 hover:bg-white/10 hover:text-white"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
+
+                          {openDropdown === user.id && (
+                            <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-white/10 bg-zinc-900 shadow-xl">
+                              <button
+                                onClick={() => handleToggleActive(user)}
+                                disabled={actionLoading === user.id}
+                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10"
+                              >
+                                <Power className="h-4 w-4" />
+                                {user.is_active ? 'Suspend' : 'Activate'}
+                              </button>
+                              <button
+                                onClick={() => handleForceLogout(user)}
+                                disabled={actionLoading === user.id || !user.is_online}
+                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50"
+                              >
+                                <LogOut className="h-4 w-4" />
+                                Force Logout
+                              </button>
+                              <button
+                                onClick={() => handleResetMFA(user)}
+                                disabled={actionLoading === user.id}
+                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10"
+                              >
+                                <Shield className="h-4 w-4" />
+                                Reset MFA
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {isPaginated && totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-zinc-400">
+                  Showing {startIndex + 1}-{Math.min(endIndex, regularUsers.length)} of {regularUsers.length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-sm text-white hover:bg-white/10 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-zinc-400">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-sm text-white hover:bg-white/10 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-6">
@@ -448,188 +652,9 @@ const AdminUsersPage = () => {
           )}
         </div>
 
-        {/* Users Table */}
-        <div className="rounded-xl border border-white/10 bg-zinc-900/50 backdrop-blur-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b border-white/10 bg-white/5">
-                <tr>
-                  <th className="px-4 py-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={selectedUsers.length === paginatedUsers.length && paginatedUsers.length > 0}
-                      onChange={handleSelectAll}
-                      className="h-4 w-4 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500"
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">User</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Role</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">MFA</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Verified</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Last Login</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-zinc-400">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10">
-                {loading ? (
-                  <tr>
-                    <td colSpan="8" className="px-4 py-12 text-center text-zinc-500">
-                      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
-                      Loading users...
-                    </td>
-                  </tr>
-                ) : paginatedUsers.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" className="px-4 py-12 text-center text-zinc-500">
-                      No users found
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedUsers.map((user) => (
-                    <motion.tr
-                      key={user.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="group hover:bg-white/5 transition-colors cursor-pointer"
-                      onClick={() => setShowUserDetails(user)}
-                    >
-                      <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={selectedUsers.includes(user.id)}
-                          onChange={() => handleSelectUser(user.id)}
-                          className="h-4 w-4 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500"
-                        />
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30">
-                            <span className="text-sm font-semibold text-purple-400">
-                              {user.name?.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-white">{user.name}</p>
-                            <p className="text-xs text-zinc-500">{user.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.role === 'ADMIN'
-                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                          : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          }`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          {user.is_online && (
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                          )}
-                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.is_active
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                            }`}>
-                            {user.is_active ? 'Active' : 'Suspended'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-sm text-zinc-400">{user.mfa_state || 'DISABLED'}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        {user.is_verified ? (
-                          <Check className="h-4 w-4 text-green-400" />
-                        ) : (
-                          <XIcon className="h-4 w-4 text-red-400" />
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-xs text-zinc-500">
-                          {user.last_login_at ? new Date(user.last_login_at).toLocaleString() : 'Never'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="relative inline-block">
-                          <button
-                            onClick={() => setOpenDropdown(openDropdown === user.id ? null : user.id)}
-                            className="rounded-lg p-2 text-zinc-400 hover:bg-white/10 hover:text-white"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
-
-                          {openDropdown === user.id && (
-                            <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-white/10 bg-zinc-900 shadow-xl">
-                              <button
-                                onClick={() => handleToggleActive(user)}
-                                disabled={actionLoading === user.id}
-                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10"
-                              >
-                                <Power className="h-4 w-4" />
-                                {user.is_active ? 'Suspend' : 'Activate'}
-                              </button>
-                              <button
-                                onClick={() => handleForceLogout(user)}
-                                disabled={actionLoading === user.id || !user.is_online}
-                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50"
-                              >
-                                <LogOut className="h-4 w-4" />
-                                Force Logout
-                              </button>
-                              <button
-                                onClick={() => handleResetMFA(user)}
-                                disabled={actionLoading === user.id}
-                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/10"
-                              >
-                                <Shield className="h-4 w-4" />
-                                Reset MFA
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-zinc-400">
-                  Showing {startIndex + 1}-{Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-sm text-white hover:bg-white/10 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <span className="text-sm text-zinc-400">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-sm text-white hover:bg-white/10 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Separated Tables */}
+        {renderTableSection("Administrator Accounts", Shield, adminUsers, false)}
+        {renderTableSection("User Accounts", UserPlus, paginatedRegularUsers, true)}
       </div>
 
       {/* Modals */}
