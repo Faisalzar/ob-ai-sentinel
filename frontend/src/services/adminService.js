@@ -54,4 +54,7 @@ export const adminService = {
     // Settings
     getSettings: () => api.get('/admin/settings'),
     updateSettings: (data) => api.put('/admin/settings', data),
+
+    // Notifications
+    sendNotification: (data) => api.post('/admin/notifications', data),
 };

@@ -26,6 +26,8 @@ import VideoDetectPage from './pages/user/VideoDetectPage';
 import LiveDetectPage from './pages/user/LiveDetectPage';
 import HistoryPage from './pages/user/HistoryPage';
 import ProfileSecurityPage from './pages/user/ProfileSecurityPage';
+import NotificationsPage from './pages/user/NotificationsPage';
+import NotificationsPage from './pages/user/NotificationsPage';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -106,6 +108,7 @@ function AppContent({ theme, handleToggleTheme }) {
               <Route path="/user/detect/live" element={<LiveDetectPage />} />
               <Route path="/user/history" element={<HistoryPage />} />
               <Route path="/user/profile" element={<ProfileSecurityPage />} />
+              <Route path="/user/notifications" element={<NotificationsPage />} />
               <Route path="/user/contact" element={<ContactPage />} />
             </Route>
 

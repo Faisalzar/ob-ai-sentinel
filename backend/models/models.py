@@ -92,6 +92,8 @@ class User(Base):
     uploads = relationship("Upload", back_populates="user", cascade="all, delete-orphan")
     alerts = relationship("Alert", back_populates="user", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")
+    notifications = relationship("Notification", foreign_keys="[Notification.user_id]", back_populates="user", cascade="all, delete-orphan")
+    sent_notifications = relationship("Notification", foreign_keys="[Notification.sender_id]", back_populates="sender")
 
 
 class Upload(Base):
@@ -211,6 +213,27 @@ class Session(Base):
 
 
 
+
+
+class Notification(Base):
+    """Notification model - messages from admin to users"""
+    __tablename__ = "notifications"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    sender_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    related_upload_id = Column(UUID(as_uuid=True), ForeignKey("uploads.id"), nullable=True)
+    
+    is_read = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
+    
+    # Relationships
+    user = relationship("User", foreign_keys=[user_id], back_populates="notifications")
+    sender = relationship("User", foreign_keys=[sender_id], back_populates="sent_notifications")
+    upload = relationship("Upload")
 
 
 class SystemSettings(Base):

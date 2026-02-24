@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Code, FileCode, CheckCircle, AlertTriangle, Clock, Film, Image as ImageIcon } from 'lucide-react';
+import { X, Code, FileCode, CheckCircle, AlertTriangle, Clock, Film, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import API_BASE_URL from '../../services/apiConfig';
+import { SendMessageModal } from './SendMessageModal';
 
 export const UploadPreviewModal = ({ upload, onClose }) => {
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+
     if (!upload) return null;
 
     const getPreviewUrl = (path) => {
@@ -115,7 +118,16 @@ export const UploadPreviewModal = ({ upload, onClose }) => {
                                 </div>
                             )}
 
-                            {/* Actions area could go here */}
+                            {/* Actions area */}
+                            <div className="pt-4 border-t border-white/10 mt-6">
+                                <button
+                                    onClick={() => setIsMessageModalOpen(true)}
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-purple-600/20 text-purple-400 font-medium hover:bg-purple-600/30 border border-purple-500/20 transition-colors"
+                                >
+                                    <MessageSquare className="h-4 w-4" />
+                                    Message User About File
+                                </button>
+                            </div>
                         </div>
 
                         {/* Footer */}
@@ -130,6 +142,13 @@ export const UploadPreviewModal = ({ upload, onClose }) => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Child Modal for Messaging */}
+            <SendMessageModal
+                isOpen={isMessageModalOpen}
+                onClose={() => setIsMessageModalOpen(false)}
+                upload={upload}
+            />
         </AnimatePresence>
     );
 };
