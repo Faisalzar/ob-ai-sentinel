@@ -56,6 +56,26 @@ export const authService = {
      */
     requestPasswordReset: async (email) => {
         return await api.post('/auth/request-password-reset', { email });
+    },
+
+    /**
+     * Verify password reset OTP
+     * @param {string} email 
+     * @param {string} otp 
+     * @returns {Promise<Object>} { message: string, reset_token: string }
+     */
+    verifyPasswordResetOtp: async (email, otp) => {
+        return await api.post('/auth/verify-password-reset-otp', { email, otp });
+    },
+
+    /**
+     * Complete password reset
+     * @param {string} token - The reset token from verify step
+     * @param {string} newPassword 
+     * @returns {Promise<Object>} Response data
+     */
+    resetPassword: async (token, newPassword) => {
+        return await api.post('/auth/reset-password', { token, new_password: newPassword });
     }
 };
 
