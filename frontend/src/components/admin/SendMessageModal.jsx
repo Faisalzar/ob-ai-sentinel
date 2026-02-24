@@ -21,8 +21,15 @@ export const SendMessageModal = ({ isOpen, onClose, upload }) => {
             return;
         }
 
+        if (!upload.user_id) {
+            console.error('Missing user_id in upload object:', upload);
+            setError('System Error: User information is missing for this file. Please refresh the page and try again.');
+            return;
+        }
+
         setIsSubmitting(true);
         try {
+            console.log('SENDING MESSAGE. Upload user_id:', upload.user_id, 'Upload ID:', upload.id, 'Title:', title, 'Message:', message);
             await adminService.sendNotification({
                 user_id: upload.user_id,
                 title: title.trim(),
