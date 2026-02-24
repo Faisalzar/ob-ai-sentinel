@@ -67,6 +67,7 @@ class DetectionSummary(BaseModel):
 class UploadResponse(BaseModel):
     """Upload response"""
     id: UUID4
+    user_id: UUID4
     filename: str
     file_type: str
     file_path: str
