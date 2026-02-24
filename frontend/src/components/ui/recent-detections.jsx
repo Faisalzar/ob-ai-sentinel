@@ -177,7 +177,7 @@ const RecentDetectionsTableComponent = ({ detections = [] }) => {
                                     variant="ghost"
                                     size="sm"
                                     className="ml-auto text-zinc-400 hover:text-purple-400 gap-1.5"
-                                    onClick={() => navigate('/dashboard/history')}
+                                    onClick={() => navigate('/user/history')}
                                     title="View Evidence in History"
                                 >
                                     <span className="text-xs hidden sm:inline">Evidence</span>

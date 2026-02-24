@@ -1,14 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, ArrowRight, Cpu, User } from 'lucide-react';
+import { Menu, X, ChevronDown, ArrowRight, Cpu, User, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { notificationService } from '../../services/notificationService';
 
 const Navbar = ({ onToggleTheme }) => {
   const { user, role, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (role === 'user') {
+      const fetchUnread = async () => {
+        try {
+          const res = await notificationService.getNotifications(0, 50, true);
+          setUnreadCount(res.length);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+
+      fetchUnread();
+      const interval = setInterval(fetchUnread, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [role]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -183,6 +202,22 @@ const Navbar = ({ onToggleTheme }) => {
               </>
             ) : (
               <>
+                {role === 'user' && (
+                  <Link
+                    to="/user/notifications"
+                    className="relative flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-purple-500/20 bg-[#050508]/50 text-gray-300 transition-all duration-200 hover:bg-purple-500/10 hover:text-purple-400 mr-2"
+                    title="Notifications"
+                  >
+                    <div className="relative">
+                      <Bell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white shadow-lg shadow-purple-500/20">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                )}
                 <div
                   className="relative"
                   onMouseEnter={() => setActiveDropdown('profile')}
@@ -311,6 +346,18 @@ const Navbar = ({ onToggleTheme }) => {
                     <>
                       {role === 'user' && (
                         <>
+                          <Link
+                            to="/user/notifications"
+                            className="flex w-full items-center justify-center space-x-2 rounded-lg py-2.5 text-center font-medium text-gray-300 transition-colors duration-200 hover:bg-purple-500/10"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <span>Notifications</span>
+                            {unreadCount > 0 && (
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                              </span>
+                            )}
+                          </Link>
                           <Link
                             to="/user/profile"
                             className="block w-full rounded-lg py-2.5 text-center font-medium text-gray-300 transition-colors duration-200 hover:bg-purple-500/10"
