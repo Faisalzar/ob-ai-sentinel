@@ -14,6 +14,7 @@ class UserResponse(BaseModel):
     role: str
     mfa_enabled: bool
     is_active: bool
+    is_verified: bool
     is_online: bool = False
     mfa_state: str = "DISABLED"
     created_at: datetime
