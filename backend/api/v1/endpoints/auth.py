@@ -102,6 +102,14 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
+
+    # Check if account is suspended
+    if not user.is_active:
+        create_audit_log(db, user.id, "login", "failed", {"reason": "account_suspended"})
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account suspended by administrator"
+        )
     
     # Check if account is locked
     if user.locked_until and user.locked_until > datetime.utcnow():
