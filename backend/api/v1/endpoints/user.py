@@ -563,10 +563,9 @@ async def get_user_stats(
         Alert.user_id == current_user.id
     ).count()
     
-    # Get recent uploads from last 24 hours with detections
+    # Get recent uploads (up to 100)
     recent_uploads = db.query(Upload).filter(
-        Upload.user_id == current_user.id,
-        Upload.created_at >= twenty_four_hours_ago
+        Upload.user_id == current_user.id
     ).order_by(Upload.created_at.desc()).limit(100).all()
     
     return UserStatsResponse(
