@@ -1,5 +1,6 @@
 import { memo, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./button";
 import {
     TrendingUp,
@@ -22,8 +23,14 @@ import {
 
 // Helper function to format relative time
 const getRelativeTime = (timestamp) => {
+    // Ensure the timestamp string ends with 'Z' because the DB stores UTC
+    let timeStr = timestamp;
+    if (typeof timeStr === 'string' && timeStr.includes('T') && !timeStr.endsWith('Z')) {
+        timeStr += 'Z';
+    }
+
     const now = new Date();
-    const time = new Date(timestamp);
+    const time = new Date(timeStr);
     const diffMs = now - time;
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
@@ -31,11 +38,18 @@ const getRelativeTime = (timestamp) => {
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
-    return time.toLocaleDateString();
+
+    return time.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 };
 
 const RecentDetectionsTableComponent = ({ detections = [] }) => {
     const [currentPage, setCurrentPage] = useState(1);
+    const navigate = useNavigate();
     const detectionsPerPage = 8;
 
     // Calculate pagination
@@ -159,8 +173,15 @@ const RecentDetectionsTableComponent = ({ detections = [] }) => {
                                     <span>{getRelativeTime(item.time)}</span>
                                 </div>
 
-                                <Button variant="ghost" size="sm" className="ml-auto text-zinc-400 hover:text-white">
-                                    <MoreHorizontal className="h-4 w-4" />
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="ml-auto text-zinc-400 hover:text-purple-400 gap-1.5"
+                                    onClick={() => navigate('/dashboard/history')}
+                                    title="View Evidence in History"
+                                >
+                                    <span className="text-xs hidden sm:inline">Evidence</span>
+                                    <ExternalLink className="h-4 w-4" />
                                 </Button>
                             </div>
                         </motion.div>
