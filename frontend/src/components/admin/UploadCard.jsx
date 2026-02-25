@@ -20,8 +20,8 @@ export const UploadCard = ({ upload, isSelected, onSelect, onView, onReprocess, 
         if (!upload.is_processed) return { color: 'text-yellow-400', bg: 'bg-yellow-400/10', icon: Clock, label: 'Processing' };
 
         const summary = upload.detection_summary || {};
-        if (summary.dangerous > 0) return { color: 'text-red-400', bg: 'bg-red-400/10', icon: AlertTriangle, label: 'Dangerous' };
-        if (summary.caution > 0) return { color: 'text-orange-400', bg: 'bg-orange-400/10', icon: AlertTriangle, label: 'Caution' };
+        if (summary.dangerous_count > 0) return { color: 'text-red-400', bg: 'bg-red-400/10', icon: AlertTriangle, label: 'Dangerous' };
+        if (summary.caution_count > 0) return { color: 'text-orange-400', bg: 'bg-orange-400/10', icon: AlertTriangle, label: 'Caution' };
 
         return { color: 'text-green-400', bg: 'bg-green-400/10', icon: CheckCircle, label: 'Safe' };
     };

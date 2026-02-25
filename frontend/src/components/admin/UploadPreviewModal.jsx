@@ -21,8 +21,8 @@ export const UploadPreviewModal = ({ upload, onClose }) => {
     const getStatusColor = () => {
         if (!upload.is_processed) return 'text-yellow-400 bg-yellow-400/10';
         const summary = upload.detection_summary || {};
-        if (summary.dangerous > 0) return 'text-red-400 bg-red-400/10';
-        if (summary.caution > 0) return 'text-orange-400 bg-orange-400/10';
+        if (summary.dangerous_count > 0) return 'text-red-400 bg-red-400/10';
+        if (summary.caution_count > 0) return 'text-orange-400 bg-orange-400/10';
         return 'text-green-400 bg-green-400/10';
     };
 
@@ -104,15 +104,15 @@ export const UploadPreviewModal = ({ upload, onClose }) => {
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between p-2 rounded bg-red-500/10 border border-red-500/20">
                                             <span className="text-sm text-red-400 font-medium">Dangerous</span>
-                                            <span className="text-sm font-bold text-red-500">{upload.detection_summary.dangerous || 0}</span>
+                                            <span className="text-sm font-bold text-red-500">{upload.detection_summary.dangerous_count || 0}</span>
                                         </div>
                                         <div className="flex items-center justify-between p-2 rounded bg-orange-500/10 border border-orange-500/20">
                                             <span className="text-sm text-orange-400 font-medium">Caution</span>
-                                            <span className="text-sm font-bold text-orange-500">{upload.detection_summary.caution || 0}</span>
+                                            <span className="text-sm font-bold text-orange-500">{upload.detection_summary.caution_count || 0}</span>
                                         </div>
                                         <div className="flex items-center justify-between p-2 rounded bg-blue-500/10 border border-blue-500/20">
                                             <span className="text-sm text-blue-400 font-medium">Harmless</span>
-                                            <span className="text-sm font-bold text-blue-500">{upload.detection_summary.harmless || 0}</span>
+                                            <span className="text-sm font-bold text-blue-500">{upload.detection_summary.harmless_count || 0}</span>
                                         </div>
                                     </div>
                                 </div>

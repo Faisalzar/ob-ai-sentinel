@@ -8,7 +8,7 @@ export const UploadStats = ({ uploads }) => {
     const images = uploads.filter(u => u.file_type === 'image').length;
     const videos = uploads.filter(u => u.file_type === 'video').length;
     const dangerous = uploads.filter(u =>
-        u.detection_summary && (u.detection_summary.dangerous > 0 || u.detection_summary.caution > 0)
+        u.detection_summary && (u.detection_summary.dangerous_count > 0 || u.detection_summary.caution_count > 0)
     ).length;
 
     // Estimate storage (mock calculation since we don't have real file sizes in this view)

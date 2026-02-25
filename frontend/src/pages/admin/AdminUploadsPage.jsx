@@ -282,9 +282,9 @@ const AdminUploadsPage = () => {
                         <td className="px-6 py-4">
                           {upload.detection_summary && (
                             <div className="flex gap-2 text-xs">
-                              {upload.detection_summary.dangerous > 0 && <span className="text-red-400 font-bold">{upload.detection_summary.dangerous} Danger</span>}
-                              {upload.detection_summary.caution > 0 && <span className="text-orange-400">{upload.detection_summary.caution} Caution</span>}
-                              {upload.detection_summary.harmless > 0 && <span className="text-blue-400">{upload.detection_summary.harmless} Check</span>}
+                              {upload.detection_summary.dangerous_count > 0 && <span className="text-red-400 font-bold">{upload.detection_summary.dangerous_count} Danger</span>}
+                              {upload.detection_summary.caution_count > 0 && <span className="text-orange-400">{upload.detection_summary.caution_count} Caution</span>}
+                              {upload.detection_summary.harmless_count > 0 && <span className="text-blue-400">{upload.detection_summary.harmless_count} Check</span>}
                             </div>
                           )}
                         </td>
