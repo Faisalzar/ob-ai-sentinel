@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, ArrowRight, Cpu, User, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/notificationService';
+import { adminService } from '../../services/adminService';
 
 const Navbar = ({ onToggleTheme }) => {
   const { user, role, logout } = useAuth();
@@ -13,10 +14,12 @@ const Navbar = ({ onToggleTheme }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (role === 'user') {
+    if (role === 'user' || role === 'admin') {
       const fetchUnread = async () => {
         try {
-          const res = await notificationService.getNotifications(0, 50, true);
+          const res = role === 'admin'
+            ? await adminService.getAdminNotifications(0, 50, true)
+            : await notificationService.getNotifications(0, 50, true);
           setUnreadCount(res.length);
         } catch (e) {
           console.error(e);
@@ -25,7 +28,18 @@ const Navbar = ({ onToggleTheme }) => {
 
       fetchUnread();
       const interval = setInterval(fetchUnread, 30000);
-      return () => clearInterval(interval);
+
+      const handleReadEvent = () => setUnreadCount(prev => Math.max(0, prev - 1));
+      const handleAllReadEvent = () => setUnreadCount(0);
+
+      window.addEventListener('notification_read', handleReadEvent);
+      window.addEventListener('notification_all_read', handleAllReadEvent);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('notification_read', handleReadEvent);
+        window.removeEventListener('notification_all_read', handleAllReadEvent);
+      };
     }
   }, [role]);
 
@@ -202,10 +216,10 @@ const Navbar = ({ onToggleTheme }) => {
               </>
             ) : (
               <>
-                {role === 'user' && (
+                {(role === 'user' || role === 'admin') && (
                   <Link
-                    to="/user/notifications"
-                    className="relative flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-purple-500/20 bg-[#050508]/50 text-gray-300 transition-all duration-200 hover:bg-purple-500/10 hover:text-purple-400 mr-2"
+                    to={role === 'admin' ? '/admin/notifications' : '/user/notifications'}
+                    className="relative flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-purple-500/20 bg-[#050508]/50 text-gray-300 transition-all duration-200 hover:bg-purple-500/10 hover:text-purple-400 mr-[10px]"
                     title="Notifications"
                   >
                     <div className="relative">
@@ -375,13 +389,27 @@ const Navbar = ({ onToggleTheme }) => {
                         </>
                       )}
                       {role === 'admin' && (
-                        <Link
-                          to="/admin/settings"
-                          className="block w-full rounded-lg py-2.5 text-center font-medium text-gray-300 transition-colors duration-200 hover:bg-purple-500/10"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          Admin Settings
-                        </Link>
+                        <>
+                          <Link
+                            to="/admin/notifications"
+                            className="flex w-full items-center justify-center space-x-2 rounded-lg py-2.5 text-center font-medium text-gray-300 transition-colors duration-200 hover:bg-purple-500/10"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <span>Admin Inbox</span>
+                            {unreadCount > 0 && (
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-[10px] font-bold text-white">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                              </span>
+                            )}
+                          </Link>
+                          <Link
+                            to="/admin/settings"
+                            className="block w-full rounded-lg py-2.5 text-center font-medium text-gray-300 transition-colors duration-200 hover:bg-purple-500/10"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            Admin Settings
+                          </Link>
+                        </>
                       )}
                       <button
                         onClick={() => {

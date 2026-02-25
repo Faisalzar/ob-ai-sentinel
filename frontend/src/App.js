@@ -35,6 +35,7 @@ import AdminUploadsPage from './pages/admin/AdminUploadsPage';
 import AdminAlertsPage from './pages/admin/AdminAlertsPage';
 import AdminLogsPage from './pages/admin/AdminLogsPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminLayout from './pages/admin/AdminLayout';
 
 import Footer from './components/layout/Footer';
@@ -119,6 +120,7 @@ function AppContent({ theme, handleToggleTheme }) {
                 <Route path="/admin/uploads" element={<AdminUploadsPage />} />
                 <Route path="/admin/alerts" element={<AdminAlertsPage />} />
                 <Route path="/admin/logs" element={<AdminLogsPage />} />
+                <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
                 <Route path="/admin/profile" element={<ProfileSecurityPage />} />
               </Route>

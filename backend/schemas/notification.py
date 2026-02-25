@@ -13,15 +13,36 @@ class NotificationBase(BaseModel):
 class NotificationCreate(NotificationBase):
     user_id: UUID4
 
+class UploadInfo(BaseModel):
+    filename: str
+    file_type: str
+    file_path: str
+    annotated_path: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+class SenderInfo(BaseModel):
+    name: str
+    email: str
+    
+    class Config:
+        from_attributes = True
+
 class NotificationResponse(NotificationBase):
     id: UUID4
     user_id: UUID4
     sender_id: UUID4
     is_read: bool
     created_at: datetime
+    upload: Optional[UploadInfo] = None
+    sender: Optional[SenderInfo] = None
     
     class Config:
         from_attributes = True
 
 class NotificationUpdate(BaseModel):
     is_read: bool
+
+class NotificationReply(BaseModel):
+    message: str = Field(..., min_length=1)

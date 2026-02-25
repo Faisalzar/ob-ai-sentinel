@@ -13,5 +13,8 @@ export const notificationService = {
         api.put(`/notifications/${id}/read`, { is_read: isRead }, { method: 'PATCH' }),
 
     // Mark all as read
-    markAllAsRead: () => api.post('/notifications/mark-all-read', {})
+    markAllAsRead: () => api.post('/notifications/mark-all-read', {}),
+
+    // Reply to notification
+    replyToNotification: (id, message) => api.post(`/notifications/${id}/reply`, { message })
 };

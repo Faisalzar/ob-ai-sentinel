@@ -57,4 +57,11 @@ export const adminService = {
 
     // Notifications
     sendNotification: (data) => api.post('/admin/notifications', data),
+    getAdminNotifications: (skip = 0, limit = 50, unreadOnly = false) => {
+        let url = `/admin/notifications?skip=${skip}&limit=${limit}`;
+        if (unreadOnly) url += `&unread_only=true`;
+        return api.get(url);
+    },
+    markAdminNotificationAsRead: (id, isRead = true) =>
+        api.put(`/admin/notifications/${id}/read`, { is_read: isRead }, { method: 'PATCH' }),
 };
