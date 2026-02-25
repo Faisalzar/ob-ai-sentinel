@@ -19,6 +19,7 @@ const AdminNotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [replyingTo, setReplyingTo] = useState(null);
+    const [markingAll, setMarkingAll] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,6 +46,20 @@ const AdminNotificationsPage = () => {
             window.dispatchEvent(new Event('notification_read'));
         } catch (error) {
             console.error("Failed to mark as read", error);
+        }
+    };
+
+    const handleMarkAllRead = async () => {
+        if (notifications.every(n => n.is_read)) return;
+        setMarkingAll(true);
+        try {
+            await adminService.markAllAdminNotificationsAsRead();
+            setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+            window.dispatchEvent(new Event('notification_read'));
+        } catch (error) {
+            console.error("Failed to mark all as read", error);
+        } finally {
+            setMarkingAll(false);
         }
     };
 
@@ -79,6 +94,17 @@ const AdminNotificationsPage = () => {
                             <span>All caught up.</span>
                         )}
                     </div>
+
+                    {unreadCount > 0 && (
+                        <button
+                            onClick={handleMarkAllRead}
+                            disabled={markingAll}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-zinc-300 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50"
+                        >
+                            {markingAll ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCheck className="h-4 w-4" />}
+                            Mark all as read
+                        </button>
+                    )}
                 </div>
 
                 <div className="bg-zinc-900/50 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm">
@@ -105,9 +131,9 @@ const AdminNotificationsPage = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, height: 0 }}
                                         onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
-                                        className={`p-6 transition-all duration-300 cursor-pointer ${!notification.is_read
-                                            ? 'bg-purple-500/5 hover:bg-purple-500/10'
-                                            : 'hover:bg-white/5'
+                                        className={`p-6 transition-all duration-300 cursor-pointer border-l-2 ${!notification.is_read
+                                            ? 'bg-purple-500/10 border-purple-500' /* Highlight Unread like WhatsApp */
+                                            : 'bg-transparent border-transparent hover:bg-white/5'
                                             }`}
                                     >
                                         <div className="flex gap-4">

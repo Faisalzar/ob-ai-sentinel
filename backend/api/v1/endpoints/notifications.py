@@ -186,3 +186,17 @@ async def mark_admin_notification_read(
     db.commit()
     db.refresh(notification)
     return notification
+
+@admin_router.post("/mark-all-read", response_model=dict)
+async def mark_all_admin_notifications_read(
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Mark all unread admin notifications as read"""
+    db.query(Notification).filter(
+        Notification.user_id == current_user.id,
+        Notification.is_read == False
+    ).update({"is_read": True})
+    
+    db.commit()
+    return {"message": "All admin notifications marked as read"}

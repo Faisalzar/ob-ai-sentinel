@@ -131,9 +131,9 @@ const NotificationsPage = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, height: 0 }}
                                         onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
-                                        className={`p-6 transition-all duration-300 cursor-pointer ${!notification.is_read
-                                            ? 'bg-purple-500/5 hover:bg-purple-500/10'
-                                            : 'hover:bg-white/5'
+                                        className={`p-6 transition-all duration-300 cursor-pointer border-l-2 ${!notification.is_read
+                                            ? 'bg-purple-500/10 border-purple-500' /* Highlight Unread like WhatsApp */
+                                            : 'bg-transparent border-transparent hover:bg-white/5'
                                             }`}
                                     >
                                         <div className="flex gap-4">

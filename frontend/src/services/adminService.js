@@ -64,4 +64,5 @@ export const adminService = {
     },
     markAdminNotificationAsRead: (id, isRead = true) =>
         api.put(`/admin/notifications/${id}/read`, { is_read: isRead }, { method: 'PATCH' }),
+    markAllAdminNotificationsAsRead: () => api.post('/admin/notifications/mark-all-read', {}),
 };
