@@ -155,18 +155,43 @@ const NotificationsPage = () => {
 
                                                 {/* Display related file info if available */}
                                                 {notification.upload && (
-                                                    <div className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-black/40 w-fit">
-                                                        {notification.upload.file_type === 'image' ? <ImageIcon className="h-4 w-4 text-purple-400" /> : <Film className="h-4 w-4 text-purple-400" />}
-                                                        <span className="text-xs text-zinc-300 font-medium">{notification.upload.filename}</span>
-                                                        <button
-                                                            className="ml-2 text-xs text-purple-400 hover:text-purple-300 underline"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/user/history`);
-                                                            }}
-                                                        >
-                                                            View in History
-                                                        </button>
+                                                    <div className="mt-4 border border-white/5 bg-black/40 rounded-xl overflow-hidden shadow-lg w-full max-w-sm">
+                                                        <div className="relative aspect-video bg-black/60 flex items-center justify-center">
+                                                            {notification.upload.file_type === 'image' ? (
+                                                                <img
+                                                                    src={`${API_BASE_URL}/${notification.upload.annotated_path || notification.upload.file_path}`}
+                                                                    alt={notification.upload.filename}
+                                                                    className="max-h-full max-w-full object-contain"
+                                                                />
+                                                            ) : notification.upload.file_type === 'video' ? (
+                                                                <video
+                                                                    src={`${API_BASE_URL}/${notification.upload.annotated_path || notification.upload.file_path}`}
+                                                                    className="h-full w-full object-cover"
+                                                                    controls
+                                                                    preload="metadata"
+                                                                />
+                                                            ) : (
+                                                                <div className="text-zinc-500 flex flex-col items-center">
+                                                                    <Film className="h-8 w-8 mb-2 opacity-50" />
+                                                                    <span className="text-xs">Media Preview Unavailable</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="px-4 py-3 bg-white/5 flex items-center justify-between">
+                                                            <div className="flex items-center gap-2 truncate pr-4">
+                                                                {notification.upload.file_type === 'image' ? <ImageIcon className="h-4 w-4 text-purple-400 shrink-0" /> : <Film className="h-4 w-4 text-purple-400 shrink-0" />}
+                                                                <span className="text-xs text-zinc-300 font-medium truncate">{notification.upload.filename}</span>
+                                                            </div>
+                                                            <button
+                                                                className="text-xs font-medium text-purple-400 hover:text-purple-300 whitespace-nowrap"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    navigate(`/user/history`);
+                                                                }}
+                                                            >
+                                                                View Details
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
 
