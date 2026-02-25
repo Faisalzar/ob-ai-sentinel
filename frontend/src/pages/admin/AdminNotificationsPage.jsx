@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, CheckCheck, Loader2, MessageSquare, ArrowLeft, Image as ImageIcon, Film } from 'lucide-react';
+import { Bell, CheckCheck, Loader2, MessageSquare, ArrowLeft, Image as ImageIcon, Film, Reply } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../../services/apiConfig';
+import AuthenticatedImage from '../../components/common/AuthenticatedImage';
+import { AdminReplyModal } from '../../components/admin/AdminReplyModal';
+
+const getPreviewUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const cleanPath = path.replace(/\\/g, '/');
+    const parts = cleanPath.split('outputs/');
+    return `/api/v1/outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
+};
 
 const AdminNotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [replyingTo, setReplyingTo] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +42,7 @@ const AdminNotificationsPage = () => {
         try {
             await adminService.markAdminNotificationAsRead(id, true);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+            window.dispatchEvent(new Event('notification_read'));
         } catch (error) {
             console.error("Failed to mark as read", error);
         }
@@ -131,14 +143,14 @@ const AdminNotificationsPage = () => {
                                                     <div className="mt-4 border border-white/5 bg-black/40 rounded-xl overflow-hidden shadow-lg w-full max-w-sm">
                                                         <div className="relative aspect-video bg-black/60 flex items-center justify-center">
                                                             {notification.upload.file_type === 'image' ? (
-                                                                <img
-                                                                    src={`${API_BASE_URL}/${notification.upload.annotated_path || notification.upload.file_path}`}
+                                                                <AuthenticatedImage
+                                                                    src={getPreviewUrl(notification.upload.annotated_path || notification.upload.file_path)}
                                                                     alt={notification.upload.filename}
                                                                     className="max-h-full max-w-full object-contain"
                                                                 />
                                                             ) : notification.upload.file_type === 'video' ? (
                                                                 <video
-                                                                    src={`${API_BASE_URL}/${notification.upload.annotated_path || notification.upload.file_path}`}
+                                                                    src={getPreviewUrl(notification.upload.annotated_path || notification.upload.file_path)}
                                                                     className="h-full w-full object-cover"
                                                                     controls
                                                                     preload="metadata"
@@ -167,6 +179,20 @@ const AdminNotificationsPage = () => {
                                                         </div>
                                                     </div>
                                                 )}
+
+                                                <div className="mt-4 flex items-center gap-3">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setReplyingTo(notification);
+                                                            if (!notification.is_read) handleMarkAsRead(notification.id, e);
+                                                        }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 hover:bg-white/10 text-xs font-medium text-zinc-300 transition-colors"
+                                                    >
+                                                        <Reply className="h-3.5 w-3.5" />
+                                                        Reply to User
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div className="flex-shrink-0 flex items-start pt-2">
@@ -190,6 +216,14 @@ const AdminNotificationsPage = () => {
                     )}
                 </div>
             </main>
+
+            {replyingTo && (
+                <AdminReplyModal
+                    isOpen={!!replyingTo}
+                    onClose={() => setReplyingTo(null)}
+                    notification={replyingTo}
+                />
+            )}
         </div>
     );
 };
