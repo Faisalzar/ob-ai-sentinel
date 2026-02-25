@@ -8,6 +8,10 @@ from typing import List, Optional
 import uuid
 import csv
 import io
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from backend.db.base import get_db
 from datetime import datetime
