@@ -224,24 +224,17 @@ const ContactPage = () => {
               className="relative my-8 flex items-center justify-center overflow-hidden md:pr-8"
             >
               <div className="flex flex-col items-center justify-center overflow-hidden w-full h-full">
-                <article className="relative mx-auto h-[350px] min-h-[350px] w-full max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e60a64] to-[#e60a64]/5 p-6 text-3xl tracking-tight text-white md:h-[450px] md:min-h-[450px] md:p-8 md:text-3xl lg:text-4xl flex flex-col"
-                  style={{ borderColor: 'rgba(230, 10, 100, 0.2)' }}
-                >
-                  <div className="relative z-20 top-0 left-0 w-full mb-auto pb-4">
-                    <p style={{ fontWeight: 600, lineHeight: 1.2, textShadow: '0 2px 14px rgba(0,0,0,0.8)' }}>
-                      Presenting you with the best AI security possible.
-                    </p>
+                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e60a64] to-[#e60a64]/5 p-6 text-3xl tracking-tight text-white md:h-[450px] md:min-h-80 md:p-8 md:text-4xl md:leading-[1.05] lg:text-5xl" style={{ borderColor: 'rgba(230, 10, 100, 0.2)' }}>
+                  <div style={{ position: 'relative', zIndex: 20 }}>
+                    Presenting you with the best AI security possible.
                   </div>
-
-                  <div className="absolute inset-x-0 bottom-[5px] mx-auto z-0 flex h-full w-full max-w-[320px] items-center justify-center transition-all duration-700 hover:scale-105 md:inset-x-auto md:-right-24 md:-bottom-24 md:max-w-[500px]" style={{ opacity: 0.95 }}>
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                      <Earth
-                        scale={1.1}
-                        baseColor={[1, 0, 0.3]}
-                        markerColor={[0, 0, 0]}
-                        glowColor={[1, 0.3, 0.4]}
-                      />
-                    </div>
+                  <div className="absolute -right-20 -bottom-20 z-10 mx-auto flex h-full w-full max-w-[300px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-28 md:-bottom-28 md:max-w-[550px]">
+                    <Earth
+                      scale={1.1}
+                      baseColor={[1, 0, 0.3]}
+                      markerColor={[0, 0, 0]}
+                      glowColor={[1, 0.3, 0.4]}
+                    />
                   </div>
                 </article>
               </div>
