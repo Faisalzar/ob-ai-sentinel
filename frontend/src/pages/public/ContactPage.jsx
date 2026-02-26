@@ -233,7 +233,7 @@ const ContactPage = () => {
                     </p>
                   </div>
 
-                  <div className="absolute -right-16 -bottom-16 z-0 mx-auto flex h-full w-full max-w-[320px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-24 md:-bottom-24 md:max-w-[500px]" style={{ opacity: 0.95 }}>
+                  <div className="absolute inset-x-0 bottom-[5px] mx-auto z-0 flex h-full w-full max-w-[320px] items-center justify-center transition-all duration-700 hover:scale-105 md:inset-x-auto md:-right-24 md:-bottom-24 md:max-w-[500px]" style={{ opacity: 0.95 }}>
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                       <Earth
                         scale={1.1}
