@@ -289,15 +289,18 @@
 }
 
 .security-item {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.security-item .eb-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 16px;
     padding: 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .security-item h4 {

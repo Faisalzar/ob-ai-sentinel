@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import ParticlesBackground from '../../components/reactbits/ParticlesBackground';
 import Earth from '../../components/ui/globe';
-import GradualBlur from '../../components/reactbits/GradualBlur';
 import TargetCursor from '../../components/reactbits/TargetCursor';
 import ScrambledText from '../../components/reactbits/ScrambledText';
 import ElectricBorder from '../../components/reactbits/ElectricBorder';
@@ -81,14 +80,6 @@ const ContactPage = () => {
         parallaxOn
         hoverDuration={0.2}
       />
-
-      <GradualBlur
-        preset="page-footer"
-        strength={4}
-        opacity={0.7}
-        zIndex={5}
-      />
-
       {/* Background Particles */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, opacity: 0.15 }}>
         <ParticlesBackground color="rgba(168,85,247,0.4)" />
@@ -243,7 +234,7 @@ const ContactPage = () => {
                     <p style={{ fontWeight: 600, lineHeight: 1.2 }}>Presenting you with the best AI security possible.</p>
                   </div>
 
-                  <div className="absolute -right-20 -bottom-20 z-0 mx-auto flex h-full w-full max-w-[300px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-28 md:-bottom-28 md:max-w-[550px]" style={{ opacity: 0.8 }}>
+                  <div className="absolute -right-4 -bottom-4 z-0 mx-auto flex h-[250px] w-[250px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-28 md:-bottom-28 md:h-full md:w-full md:max-w-[550px]" style={{ opacity: 0.8 }}>
                     {/* Cobe Earth Implementation */}
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Earth
