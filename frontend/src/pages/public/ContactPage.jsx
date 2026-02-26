@@ -236,9 +236,9 @@ const ContactPage = () => {
 
                   <div className="absolute -right-4 -bottom-4 z-0 mx-auto flex h-[250px] w-[250px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-28 md:-bottom-28 md:h-full md:w-full md:max-w-[550px]" style={{ opacity: 0.8 }}>
                     {/* Cobe Earth Implementation */}
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                       <Earth
-                        scale={0.85}
+                        scale={0.7} // Reduced scale slightly for mobile
                         baseColor={[1, 0, 0.3]} // Pink
                         markerColor={[0, 0, 0]}
                         glowColor={[1, 0.3, 0.4]}
