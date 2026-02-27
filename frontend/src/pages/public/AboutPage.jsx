@@ -13,7 +13,8 @@ import {
   Target,
   ShieldCheck,
   Zap,
-  Lock
+  Lock,
+  Users
 } from 'lucide-react';
 import TargetCursor from '../../components/reactbits/TargetCursor';
 
