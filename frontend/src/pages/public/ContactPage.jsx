@@ -225,12 +225,12 @@ const ContactPage = () => {
               className="relative my-8 flex items-center justify-center overflow-hidden md:pr-8"
             >
               <div className="bg-background flex flex-col items-center justify-center overflow-hidden w-full h-full">
-                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 w-full max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#A8E524] to-[#A8E524]/5 p-6 text-center md:h-[450px] md:min-h-80 md:p-8">
+                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 w-full max-w-[450px] overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/10 to-transparent backdrop-blur-md p-6 text-center md:h-[450px] md:min-h-80 md:p-8">
                   <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
                     <Earth
-                      baseColor={[1, 0, 0.3]}
-                      markerColor={[1, 0, 0.33]}
-                      glowColor={[1, 0, 0.3]}
+                      baseColor={[0.6, 0.27, 0.92]}    // Purple #9D47EC equivalent
+                      markerColor={[0.8, 0.4, 1.0]}    // Lighter purple
+                      glowColor={[0.6, 0.27, 0.92]}
                     />
                   </div>
                 </article>
