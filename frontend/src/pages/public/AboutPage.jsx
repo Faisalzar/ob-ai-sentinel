@@ -6,8 +6,6 @@ import { Spotlight } from '../../components/ui/spotlight';
 import { BorderBeam } from '../../components/ui/border-beam';
 import { CardHoverEffect } from '../../components/ui/pulse-card';
 import {
-  Globe,
-  Users,
   Heart,
   Lightbulb,
   Sparkles,
@@ -23,7 +21,6 @@ const iconComponents = {
   Users: Users,
   Heart: Heart,
   Lightbulb: Lightbulb,
-  Globe: Globe,
   Sparkles: Sparkles,
   Rocket: Rocket,
   Target: Target,
@@ -55,7 +52,7 @@ const defaultValues = [
     title: 'Global Scale',
     description:
       "Deploy across thousands of locations seamlessly, managing your entire security infrastructure from one dashboard.",
-    icon: 'Globe',
+    icon: 'Sparkles', // fallback icon
   },
 ];
 

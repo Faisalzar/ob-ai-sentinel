@@ -6,7 +6,6 @@ import {
     Cpu,
     Activity,
     Database,
-    Globe,
     Lock,
     HardDrive
 } from 'lucide-react';
