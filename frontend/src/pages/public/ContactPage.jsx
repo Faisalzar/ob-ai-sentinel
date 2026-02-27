@@ -225,18 +225,18 @@ const ContactPage = () => {
               className="relative my-8 flex items-center justify-center overflow-hidden md:pr-8"
             >
               <div className="bg-background flex flex-col items-center justify-center overflow-hidden w-full h-full">
-                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 w-full max-w-[450px] overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/10 to-transparent backdrop-blur-md p-6 text-center md:h-[450px] md:min-h-80 md:p-8 flex flex-col items-center">
-                  <div className="relative z-10 w-full mb-4">
+                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 w-full max-w-[450px] overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-900/10 to-transparent backdrop-blur-md p-4 text-center md:h-[450px] md:min-h-80 md:p-6 flex flex-col items-center">
+                  <div className="relative z-10 w-full mb-2 mt-4">
                     <h1 className="text-4xl md:text-5xl font-semibold tracking-tighter text-white">
                       Welcome to Ob AI Sentinel
                     </h1>
                   </div>
-                  <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full max-w-[280px] md:max-w-[320px]">
+                  <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full max-w-[200px] md:max-w-[240px]">
                     <Earth
                       baseColor={[0.6, 0.27, 0.92]}    // Purple #9D47EC equivalent
                       markerColor={[0.8, 0.4, 1.0]}    // Lighter purple
                       glowColor={[0.6, 0.27, 0.92]}
-                      scale={1.2}
+                      scale={1}
                     />
                   </div>
                 </article>
