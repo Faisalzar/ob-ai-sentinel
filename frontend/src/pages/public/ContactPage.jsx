@@ -223,17 +223,15 @@ const ContactPage = () => {
               transition={{ duration: 0.5, delay: 0.5 }}
               className="relative my-8 flex items-center justify-center overflow-hidden md:pr-8"
             >
-              <div className="flex flex-col items-center justify-center overflow-hidden w-full h-full">
-                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#e60a64] to-[#e60a64]/5 p-6 text-3xl tracking-tight text-white md:h-[450px] md:min-h-80 md:p-8 md:text-4xl md:leading-[1.05] lg:text-5xl" style={{ borderColor: 'rgba(230, 10, 100, 0.2)' }}>
-                  <div style={{ position: 'relative', zIndex: 20 }}>
-                    Presenting you with the best AI security possible.
-                  </div>
+              <div className="bg-background flex flex-col items-center justify-center overflow-hidden w-full h-full">
+                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#A8E524] to-[#A8E524]/5 p-6 text-3xl tracking-tight text-black md:h-[450px] md:min-h-80 md:p-8 md:text-4xl md:leading-[1.05] lg:text-5xl">
+                  Presenting you with the best UI possible.
                   <div className="absolute -right-20 -bottom-20 z-10 mx-auto flex h-full w-full max-w-[300px] items-center justify-center transition-all duration-700 hover:scale-105 md:-right-28 md:-bottom-28 md:max-w-[550px]">
                     <Earth
                       scale={1.1}
-                      baseColor={[1, 0, 0.3]}
-                      markerColor={[0, 0, 0]}
-                      glowColor={[1, 0.3, 0.4]}
+                      baseColor={[0.65, 0.898, 0.141]}
+                      markerColor={[0.65, 0.898, 0.141]}
+                      glowColor={[0.65, 0.898, 0.141]}
                     />
                   </div>
                 </article>
