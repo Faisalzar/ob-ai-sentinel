@@ -17,6 +17,7 @@ import ParticlesBackground from '../../components/reactbits/ParticlesBackground'
 import TargetCursor from '../../components/reactbits/TargetCursor';
 import ScrambledText from '../../components/reactbits/ScrambledText';
 import ElectricBorder from '../../components/reactbits/ElectricBorder';
+import Earth from '../../components/ui/globe';
 import { sendContactMessage } from '../../services/contactService';
 import './ContactPage.css';
 
@@ -224,8 +225,14 @@ const ContactPage = () => {
               className="relative my-8 flex items-center justify-center overflow-hidden md:pr-8"
             >
               <div className="bg-background flex flex-col items-center justify-center overflow-hidden w-full h-full">
-                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#A8E524] to-[#A8E524]/5 p-6 text-3xl tracking-tight text-black md:h-[450px] md:min-h-80 md:p-8 md:text-4xl md:leading-[1.05] lg:text-5xl">
-                  Presenting you with the best UI possible.
+                <article className="relative mx-auto mt-8 mb-8 h-[350px] min-h-60 w-full max-w-[450px] overflow-hidden rounded-3xl border bg-gradient-to-b from-[#A8E524] to-[#A8E524]/5 p-6 text-center md:h-[450px] md:min-h-80 md:p-8">
+                  <div className="relative z-10 flex flex-col items-center justify-center h-full w-full">
+                    <Earth
+                      baseColor={[1, 0, 0.3]}
+                      markerColor={[1, 0, 0.33]}
+                      glowColor={[1, 0, 0.3]}
+                    />
+                  </div>
                 </article>
               </div>
             </motion.div>
