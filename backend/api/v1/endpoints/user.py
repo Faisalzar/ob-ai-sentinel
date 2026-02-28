@@ -14,7 +14,7 @@ import re
 from pathlib import Path
 
 from backend.db.base import get_db
-from backend.models.models import User, Upload, Detection, Alert, FileType, ThreatLevel, AlertStatus, SystemSettings, Notification, NotificationType
+from backend.models.models import User, Upload, Detection, Alert, FileType, ThreatLevel, AlertStatus, SystemSettings
 from backend.schemas.user import DetectionResponse, UserStatsResponse, UploadResponse, DetectionResult, DetectionBox, DetectionSummary, UserChangePassword, UserUpdate, UserResponse, SystemSettingsPublic
 from backend.core.dependencies import get_current_active_user_strict as get_current_active_user
 from backend.services.detection_service import detection_service
@@ -167,31 +167,12 @@ async def save_alert(db: Session, user_id: uuid.UUID, upload_id: uuid.UUID, dete
     db.commit()
     db.refresh(alert)
     
-    # Create Persistent Notification for ALL Admins
-    from backend.models.models import UserRole
-    admins = db.query(User).filter(User.role == UserRole.ADMIN).all()
-    user = db.query(User).filter(User.id == user_id).first()
-    
-    notification_message = f"DANGER: {detection['class_name']} detected by {user.email if user else 'Unknown'}"
-    
-    for admin in admins:
-        notif = Notification(
-            user_id=admin.id,
-            title="CRITICAL THREAT DETECTED",
-            message=notification_message,
-            notification_type=NotificationType.SECURITY_ALERT,
-            is_read=False,
-            # Link exactly to the frontend alerts dashboard
-            link=f"/dashboard/admin/alerts?id={alert.id}",
-            # Use the local file path OR cloudinary URL from the alert
-            image_url=alert.image_path
-        )
-        db.add(notif)
-    
-    # Save the persistent notifications before broadcasting
-    db.commit()
-
     # Broadcast to admins using WebSocket (Live Toast)
+    
+    # We must use asyncio.create_task because broadcast_to_admins is an async function
+    user = db.query(User).filter(User.id == user_id).first()
+    upload = db.query(Upload).filter(Upload.id == upload_id).first()
+    
     alert_payload = {
         "id": str(alert.id),
         "user_id": str(alert.user_id),
@@ -213,6 +194,7 @@ async def save_alert(db: Session, user_id: uuid.UUID, upload_id: uuid.UUID, dete
         "type": "new_alert",
         "data": alert_payload
     }))
+
 
 
 @router.post("/detect/image", response_model=DetectionResponse)
