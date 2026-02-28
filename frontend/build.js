@@ -1,0 +1,1 @@
+const { execSync } = require('child_process'); try { execSync('npm run build', { stdio: 'pipe' }); } catch(err) { require('fs').writeFileSync('err.log', err.stdout.toString() + '\\n' + err.stderr.toString()); }

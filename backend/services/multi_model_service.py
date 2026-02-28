@@ -565,6 +565,7 @@ class MultiModelRoboflowService:
     def _annotate_image(self, img: np.ndarray, detections: List[Dict[str, Any]]) -> np.ndarray:
         """Draw boxes and labels like local script (weapons red, others green)"""
         annotated_img = img.copy()
+        placed = []
         for det in detections:
             bbox = det['bbox']
             x1, y1, x2, y2 = int(bbox['x1']), int(bbox['y1']), int(bbox['x2']), int(bbox['y2'])
