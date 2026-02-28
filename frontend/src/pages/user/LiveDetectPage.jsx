@@ -3,6 +3,7 @@ import '../../styles/detection.css';
 import '../../styles/live-detect.css'; // Keep for specific video-container styles if needed, but override with detection.css where possible
 import { Camera, Video, StopCircle, Play, Pause, Smartphone, Monitor } from 'lucide-react';
 import { motion } from 'framer-motion';
+import API_BASE_URL from '../../services/apiConfig';
 
 const LiveDetectPage = () => {
   const [isStreaming, setIsStreaming] = useState(false);
@@ -197,7 +198,7 @@ const LiveDetectPage = () => {
           return;
         }
 
-        const response = await fetch('http://127.0.0.1:8000/api/v1/detect/image', {
+        const response = await fetch(`${API_BASE_URL}/detect/image`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
