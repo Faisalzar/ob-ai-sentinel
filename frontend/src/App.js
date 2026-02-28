@@ -3,6 +3,7 @@ import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import RedirectIfAuthenticated from './components/common/RedirectIfAuthenticated';
+import ScrollToTop from './components/common/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 
 // Public pages
@@ -79,6 +80,7 @@ function AppContent({ theme, handleToggleTheme }) {
 
   return (
     <div className={`app-root theme-${theme} flex flex-col min-h-screen`}>
+      <ScrollToTop />
       {!isAuthPage && !isMaintenancePage && <Navbar onToggleTheme={handleToggleTheme} />}
       <main className="app-main flex-grow">
         <MaintenanceGuard>
