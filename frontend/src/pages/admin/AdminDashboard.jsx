@@ -7,7 +7,6 @@ import { QuickActions } from '../../components/ui/quick-actions';
 import { SystemStatus } from '../../components/ui/system-status';
 import { RecentActivity } from '../../components/ui/recent-activity';
 import { adminService } from '../../services/adminService';
-import { useAdminWebsocket } from '../../hooks/useAdminWebsocket';
 import { toast } from 'react-hot-toast';
 
 
@@ -22,30 +21,63 @@ export default function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Setup WebSocket connection
-  useAdminWebsocket((newAlert) => {
-    // 1. Show Toast
-    toast.error(
-      `DANGER: ${newAlert.object_name} detected! (${Math.round(newAlert.confidence * 100)}%)`,
-      {
-        duration: 8000,
-        position: 'top-right',
-        style: {
-          background: 'rgba(239, 68, 68, 0.9)',
-          color: '#fff',
-          border: '1px solid rgba(255,255,255,0.2)',
-          backdropFilter: 'blur(8px)',
-        },
-        iconTheme: {
-          primary: '#fff',
-          secondary: '#ef4444'
-        }
-      }
-    );
+  // Setup Polling instead of WebSockets (Since WS lacks persistent notifications payload in this architecture)
+  const [latestAlertId, setLatestAlertId] = useState(null);
 
-    // 2. Refresh stats to update Dashboard visually without full reload
-    loadData();
-  });
+  useEffect(() => {
+    // Initial fetch to get the baseline latest alert
+    const initBaseline = async () => {
+      try {
+        const initialAlerts = await adminService.getAlerts(0, 1);
+        if (initialAlerts && initialAlerts.length > 0) {
+          setLatestAlertId(initialAlerts[0].id);
+        }
+      } catch (err) {
+        console.error("Failed to init alert baseline", err);
+      }
+    };
+    initBaseline();
+
+    const interval = setInterval(async () => {
+      try {
+        const recentAlerts = await adminService.getAlerts(0, 1);
+        if (recentAlerts && recentAlerts.length > 0) {
+          const newAlert = recentAlerts[0];
+          // Use a callback inside setLatestAlertId to get the CURRENT state value
+          setLatestAlertId(currentLatestId => {
+            if (currentLatestId && newAlert.id !== currentLatestId) {
+              // Show Toast for the new alert
+              toast.error(
+                `DANGER: ${newAlert.object_name} detected! (${Math.round(newAlert.confidence * 100)}%)`,
+                {
+                  duration: 8000,
+                  position: 'top-right',
+                  style: {
+                    background: 'rgba(239, 68, 68, 0.9)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(8px)',
+                  },
+                  iconTheme: {
+                    primary: '#fff',
+                    secondary: '#ef4444'
+                  }
+                }
+              );
+              // Trigger a data reload visually
+              loadData();
+              return newAlert.id;
+            }
+            return currentLatestId || newAlert.id;
+          });
+        }
+      } catch (err) {
+        console.error("Polling error", err);
+      }
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const loadData = async () => {
     try {
