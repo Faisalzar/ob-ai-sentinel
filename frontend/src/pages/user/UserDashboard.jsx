@@ -3,7 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import SystemOverview from '../../components/ui/system-overview';
 import LiveThreatLog from '../../components/ui/live-threat-log';
-import LiveCameraGrid from '../../components/ui/live-camera-grid';
+import UserMediaStats from '../../components/ui/user-media-stats';
 import { RecentDetectionsTable } from '../../components/ui/recent-detections';
 import { motion } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
@@ -38,6 +38,10 @@ const UserDashboard = () => {
         active_cameras: data.active_cameras ?? 0,
         dangerous_alerts: data.dangerous_alerts ?? 0,
         total_detections: data.total_detections ?? 0,
+        total_uploads: data.total_uploads ?? 0,
+        image_count: data.image_count ?? 0,
+        video_count: data.video_count ?? 0,
+        live_count: data.live_count ?? 0,
         detections: detections
       });
       setLastUpdated(new Date());
@@ -137,14 +141,14 @@ const UserDashboard = () => {
               <LiveThreatLog />
             </motion.div>
 
-            {/* Live Camera Grid (2/3 width on XL) */}
+            {/* Media Uploads Grid (2/3 width on XL) */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="xl:col-span-2"
             >
-              <LiveCameraGrid />
+              <UserMediaStats stats={stats} />
             </motion.div>
           </div>
 
