@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Activity, Shield, Upload } from 'lucide-react';
+import { Users, Activity, Shield, Upload, Server, HardDrive } from 'lucide-react';
 import { DashboardCard } from '../../components/ui/dashboard-card';
 import { RevenueChart } from '../../components/ui/revenue-chart';
 import { UsersTable } from '../../components/ui/users-table';
@@ -40,31 +40,31 @@ export default function AdminDashboard() {
       if (health) {
         setHealthData([
           {
-            label: "Database",
-            status: health.database === 'healthy' ? 'Healthy' : 'Issues',
+            label: "System Status",
+            status: health.database === 'healthy' ? 'Operational' : 'Issues',
             color: health.database === 'healthy' ? 'text-green-500' : 'text-red-500',
             icon: Shield,
             percentage: health.database === 'healthy' ? 100 : 0
           },
           {
-            label: "AI Model",
-            status: health.ai_model === 'loaded' ? 'Active' : 'Offline',
-            color: health.ai_model === 'loaded' ? 'text-green-500' : 'text-yellow-500',
-            icon: Activity,
-            percentage: health.ai_model === 'loaded' ? 100 : 0
-          },
-          {
             label: "CPU Usage",
-            status: `${health.system?.cpu_percent}%`,
-            color: health.system?.cpu_percent > 80 ? 'text-red-500' : 'text-blue-500',
-            icon: Activity, // Reusing Activity icon
+            status: `${health.system?.cpu_percent || 0}%`,
+            color: 'text-blue-500',
+            icon: Activity,
             percentage: health.system?.cpu_percent || 0
           },
           {
-            label: "Storage",
-            status: `${health.system?.disk_percent}% Used`,
-            color: health.system?.disk_percent > 90 ? 'text-red-500' : 'text-yellow-500',
-            icon: Upload, // Reusing Upload icon as proxy for storage/disk
+            label: "Memory Usage",
+            status: `${health.system?.memory_percent || 0}%`,
+            color: 'text-purple-500',
+            icon: Server,
+            percentage: health.system?.memory_percent || 0
+          },
+          {
+            label: "Disk Space",
+            status: `${(health.system?.disk_free_gb || 0).toFixed(1)} GB Free`,
+            color: 'text-orange-500',
+            icon: HardDrive,
             percentage: health.system?.disk_percent || 0
           }
         ]);
