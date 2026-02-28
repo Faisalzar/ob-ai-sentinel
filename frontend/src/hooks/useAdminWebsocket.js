@@ -12,21 +12,15 @@ export const useAdminWebsocket = (onAlertReceived) => {
         // Convert http/https to ws/wss
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 
-        // Custom domain logic based on apiConfig
-        let wsHost = '';
-        if (API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1')) {
-            wsHost = 'localhost:8000';
-        } else {
-            // Extract domain from API_BASE_URL (e.g. from https://api.example.com/api/v1)
-            try {
-                const url = new URL(API_BASE_URL);
-                wsHost = url.host;
-            } catch (e) {
-                wsHost = window.location.host;
-            }
+        // Convert base http/https API URL to ws/wss natively
+        let wsUrlBase = API_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
+
+        // Remove trailing /api/v1 if it exists so we can cleanly append the websocket route
+        if (wsUrlBase.endsWith('/api/v1')) {
+            wsUrlBase = wsUrlBase.slice(0, -7);
         }
 
-        const wsUrl = `${wsProtocol}//${wsHost}/api/v1/admin/ws/alerts?token=${token}`;
+        const wsUrl = `${wsUrlBase}/api/v1/admin/ws/alerts?token=${token}`;
 
         console.log("Connecting to Admin WS:", wsUrl);
         const ws = new WebSocket(wsUrl);
