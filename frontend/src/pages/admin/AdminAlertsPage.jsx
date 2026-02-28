@@ -6,7 +6,7 @@ import { AlertsFilter } from '../../components/admin/AlertsFilter';
 import { AlertList } from '../../components/admin/AlertList';
 import { AlertDetailsModal } from '../../components/admin/AlertDetailsModal';
 import BasicPagination from '../../components/ui/basic-pagination';
-import { Loader2, Download, ShieldAlert } from 'lucide-react';
+import { Loader2, FileText, ShieldAlert } from 'lucide-react';
 import { useAdminWebsocket } from '../../hooks/useAdminWebsocket';
 import { toast } from 'react-hot-toast';
 import '../../styles/dashboard.css';
@@ -131,8 +131,8 @@ const AdminAlertsPage = () => {
           onClick={() => window.open(adminService.exportAlerts(), '_blank')}
           className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 border border-white/10"
         >
-          <Download className="h-4 w-4" />
-          Export CSV
+          <FileText className="h-4 w-4" />
+          Export PDF
         </button>
       </header>
 

@@ -10,6 +10,10 @@ import csv
 import io
 import os
 import logging
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 logger = logging.getLogger(__name__)
 
@@ -583,49 +587,86 @@ async def reprocess_upload(
 
 
 @router.get("/export/alerts")
-async def export_alerts_csv(
+async def export_alerts_pdf(
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """
-    Export all alerts as CSV
+    Export all alerts as a professional PDF report
     """
-    alerts = db.query(Alert).join(Upload).join(User).all()
+    alerts = db.query(Alert).join(Upload).join(User).order_by(Alert.timestamp.desc()).all()
     
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
+    # Create PDF in memory
+    output = io.BytesIO()
+    doc = SimpleDocTemplate(output, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+    elements = []
     
-    # Write header
-    writer.writerow([
-        "Alert ID", "User Email", "Upload ID", "Filename",
-        "Object Name", "Threat Level", "Confidence",
-        "Timestamp", "Image Path", "Status", "Admin Notes"
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#ffffff'), backColor=colors.HexColor('#1f2937'), alignment=1, spaceAfter=20)
+    
+    # Title
+    elements.append(Paragraph("<b>Ob AI Sentinel - Threat Intelligence Report</b>", title_style))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Total Alerts: {len(alerts)}", styles['Normal']))
+    elements.append(Spacer(1, 15))
+    
+    # Table Data
+    data = [["Alert ID", "Date", "User Email", "Object", "Threat Level", "Confidence"]]
+    
+    for alert in alerts:
+        data.append([
+            str(alert.id)[:8] + "...",
+            alert.timestamp.strftime("%Y-%m-%d %H:%M"),
+            alert.user.email if alert.user else "Unknown",
+            alert.object_name.capitalize(),
+            alert.threat_level.value.upper(),
+            f"{float(alert.confidence)*100:.1f}%"
+        ])
+        
+    # Create Table
+    table = Table(data, colWidths=[70, 110, 170, 120, 100, 80])
+    
+    # Add Style
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4f46e5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 11),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f9fafb')),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#111827')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#d1d5db')),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ])
     
-    # Write data
-    for alert in alerts:
-        writer.writerow([
-            str(alert.id),
-            alert.user.email,
-            str(alert.upload_id),
-            alert.upload.filename,
-            alert.object_name,
-            alert.threat_level.value,
-            alert.confidence,
-            alert.timestamp.isoformat(),
-            alert.image_path,
-            alert.status.value,
-            alert.admin_notes or ""
-        ])
+    # Highlight Dangerous threats
+    for i, row in enumerate(data[1:], start=1):
+        if "DANGEROUS" in row[4]:
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#ef4444'))
+            table_style.add('FONTNAME', (4, i), (4, i), 'Helvetica-Bold')
+        elif "CAUTION" in row[4]:
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#eab308'))
+            table_style.add('FONTNAME', (4, i), (4, i), 'Helvetica-Bold')
+        else:
+            table_style.add('TEXTCOLOR', (4, i), (4, i), colors.HexColor('#22c55e'))
     
-    # Create response
+    table.setStyle(table_style)
+    elements.append(table)
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Return response
     output.seek(0)
     return Response(
         content=output.getvalue(),
-        media_type="text/csv",
+        media_type="application/pdf",
         headers={
-            "Content-Disposition": "attachment; filename=alerts_export.csv"
+            "Content-Disposition": "attachment; filename=alerts_export.pdf"
         }
     )
 
@@ -738,13 +779,13 @@ async def update_system_settings(
 
 
 @router.get("/export/audit-logs")
-async def export_audit_logs_csv(
+async def export_audit_logs_pdf(
     ids: Optional[str] = None,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """
-    Export all audit logs as CSV
+    Export all audit logs as a professional PDF report
     """
     query = db.query(AuditLog).join(User, isouter=True)
     
@@ -758,35 +799,66 @@ async def export_audit_logs_csv(
             
     logs = query.order_by(AuditLog.created_at.desc()).all()
     
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
+    # Create PDF in memory
+    output = io.BytesIO()
+    doc = SimpleDocTemplate(output, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+    elements = []
     
-    # Write header
-    writer.writerow([
-        "Log ID", "Timestamp", "User Email", "Action", 
-        "Resource", "Status", "IP Address", "Metadata"
-    ])
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#ffffff'), backColor=colors.HexColor('#1f2937'), alignment=1, spaceAfter=20)
     
-    # Write data
+    # Title
+    elements.append(Paragraph("<b>Ob AI Sentinel - System Audit Logs</b>", title_style))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Total Logs: {len(logs)}", styles['Normal']))
+    elements.append(Spacer(1, 15))
+    
+    # Table Data
+    data = [["Log ID", "Date & Time", "User", "Action", "Resource", "Status", "IP Address"]]
+    
     for log in logs:
-        writer.writerow([
+        data.append([
             str(log.id),
-            log.created_at.isoformat(),
+            log.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             log.user.email if log.user else "System",
-            log.action,
+            log.action.replace("_", " ").title(),
             log.resource or "-",
             log.status,
-            log.ip_address,
-            str(log.meta) if log.meta else ""
+            log.ip_address or "Unknown"
         ])
+        
+    # Create Table
+    table = Table(data, colWidths=[50, 130, 150, 120, 120, 70, 90])
     
-    # Create response
+    # Add Style
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f9fafb')),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#374151')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb')),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ])
+    
+    table.setStyle(table_style)
+    elements.append(table)
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Return response
     output.seek(0)
     return Response(
         content=output.getvalue(),
-        media_type="text/csv",
+        media_type="application/pdf",
         headers={
-            "Content-Disposition": "attachment; filename=audit_logs_export.csv"
+            "Content-Disposition": "attachment; filename=audit_logs_export.pdf"
         }
     )

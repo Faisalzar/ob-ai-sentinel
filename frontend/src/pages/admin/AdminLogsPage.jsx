@@ -5,7 +5,7 @@ import { LogStats } from '../../components/admin/LogStats';
 import { LogsFilter } from '../../components/admin/LogsFilter';
 import { LogList } from '../../components/admin/LogList';
 import BasicPagination from '../../components/ui/basic-pagination';
-import { Loader2, Download, Shield } from 'lucide-react';
+import { Loader2, FileText, Shield } from 'lucide-react';
 import '../../styles/dashboard.css';
 
 const AdminLogsPage = () => {
@@ -79,8 +79,8 @@ const AdminLogsPage = () => {
           onClick={() => window.open(adminService.exportAuditLogs(selectedLogIds), '_blank')}
           className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 border border-white/10"
         >
-          <Download className="h-4 w-4" />
-          {selectedLogIds.length > 0 ? `Export Selected (${selectedLogIds.length})` : 'Export All CSV'}
+          <FileText className="h-4 w-4" />
+          {selectedLogIds.length > 0 ? `Export Selected PDF (${selectedLogIds.length})` : 'Export All as PDF'}
         </button>
       </header>
 
