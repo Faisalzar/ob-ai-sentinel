@@ -255,7 +255,7 @@ async def detect_image(
             except:
                 pass
         else:
-            upload.annotated_path = str(annotated_file_path)
+            upload.annotated_path = f"user_{current_user.id}/{annotated_filename}"
         
         # Save detections to database
         warnings = []
@@ -271,7 +271,7 @@ async def detect_image(
             
             # Create alert for dangerous objects
             if det["threat_level"] == "dangerous":
-                await save_alert(db, current_user.id, upload.id, det, str(annotated_file_path))
+                await save_alert(db, current_user.id, upload.id, det, upload.annotated_path)
                 warnings.append(f"⚠️ DANGEROUS: {det['class_name']} detected with {float(det['confidence'])*100:.1f}% confidence")
         
         # Get summary
@@ -389,26 +389,6 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
             except Exception:
                 pass
                 
-        # Save detections to database
-        warnings = []
-        for det in detections:
-            detection_record = Detection(
-                upload_id=upload.id,
-                class_name=det["class_name"],
-                confidence=det["confidence"],
-                bbox=det["bbox"],
-                threat_level=ThreatLevel(det["threat_level"])
-            )
-            db.add(detection_record)
-            
-            # Create alert for dangerous objects
-            if det["threat_level"] == "dangerous":
-                await save_alert(db, upload.user_id, upload.id, det, output_path)
-                warnings.append(f"⚠️ DANGEROUS: {det['class_name']} detected")
-                
-        # Get summary
-        summary = detection_service.get_detection_summary(detections)
-        
         # Upload to Storage
         from backend.storage.storage_factory import storage
         import os
@@ -424,7 +404,27 @@ async def process_video_background(upload_id: str, video_path: str, user_id: str
             except:
                 pass
         else:
-            upload.annotated_path = output_path
+            upload.annotated_path = f"user_{user_id}/{output_filename}"
+
+        # Save detections to database
+        warnings = []
+        for det in detections:
+            detection_record = Detection(
+                upload_id=upload.id,
+                class_name=det["class_name"],
+                confidence=det["confidence"],
+                bbox=det["bbox"],
+                threat_level=ThreatLevel(det["threat_level"])
+            )
+            db.add(detection_record)
+            
+            # Create alert for dangerous objects
+            if det["threat_level"] == "dangerous":
+                await save_alert(db, upload.user_id, upload.id, det, upload.annotated_path)
+                warnings.append(f"⚠️ DANGEROUS: {det['class_name']} detected")
+                
+        # Get summary
+        summary = detection_service.get_detection_summary(detections)
         
         # Update upload record
         upload.detection_summary = summary
@@ -650,8 +650,9 @@ async def serve_output_file(
     Serve annotated output files (with Range request support for videos)
     Only users can access their own files
     """
+    from backend.models.models import UserRole
     expected_prefix = f"user_{current_user.id}/"
-    if not file_path.startswith(expected_prefix):
+    if not file_path.startswith(expected_prefix) and current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     full_path = Path(settings.LOCAL_OUTPUT_PATH) / file_path

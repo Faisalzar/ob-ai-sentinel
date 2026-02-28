@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, MessageSquare, AlertTriangle, CheckCircle, Clock, XCircle, ShieldAlert } from 'lucide-react';
 import API_BASE_URL from '../../services/apiConfig';
+import AuthenticatedImage from '../common/AuthenticatedImage';
 
 export const AlertList = ({ alerts, onStatusChange, onAddNote, onView, startIndex = 0 }) => {
 
@@ -9,7 +10,8 @@ export const AlertList = ({ alerts, onStatusChange, onAddNote, onView, startInde
         if (!path) return null;
         if (path.startsWith('http')) return path;
         const cleanPath = path.replace(/\\/g, '/');
-        return `${API_BASE_URL.replace('/api/v1', '')}/${cleanPath}`;
+        const parts = cleanPath.split('outputs/');
+        return `/api/v1/outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
     };
 
     const isVideo = (path) => {
@@ -97,11 +99,11 @@ export const AlertList = ({ alerts, onStatusChange, onAddNote, onView, startInde
                                                             </div>
                                                         </>
                                                     ) : (
-                                                        <img
+                                                        <AuthenticatedImage
                                                             src={getPreviewUrl(alert.image_path)}
                                                             alt=""
                                                             className="h-full w-full object-cover"
-                                                            onError={(e) => e.target.style.display = 'none'}
+                                                            onClick={(e) => { e.stopPropagation(); onView(alert); }}
                                                         />
                                                     )
                                                 )}

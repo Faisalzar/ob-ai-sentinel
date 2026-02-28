@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldAlert, CheckCircle, Clock, Save, AlertTriangle, User, FileText, Calendar } from 'lucide-react';
 import API_BASE_URL from '../../services/apiConfig';
+import AuthenticatedImage from '../common/AuthenticatedImage';
 
 export const AlertDetailsModal = ({ alert, onClose, onUpdateStatus, onUpdateNote }) => {
     const [note, setNote] = useState(alert?.admin_notes || '');
@@ -13,7 +14,8 @@ export const AlertDetailsModal = ({ alert, onClose, onUpdateStatus, onUpdateNote
         if (!path) return null;
         if (path.startsWith('http')) return path;
         const cleanPath = path.replace(/\\/g, '/');
-        return `${API_BASE_URL.replace('/api/v1', '')}/${cleanPath}`;
+        const parts = cleanPath.split('outputs/');
+        return `/api/v1/outputs/${parts.length > 1 ? parts[1] : cleanPath}`;
     };
 
     const isVideo = (path) => {
@@ -58,14 +60,10 @@ export const AlertDetailsModal = ({ alert, onClose, onUpdateStatus, onUpdateNote
                                 muted
                             />
                         ) : (
-                            <img
+                            <AuthenticatedImage
                                 src={getPreviewUrl(alert.image_path)}
                                 alt={alert.object_name}
                                 className="max-h-full max-w-full object-contain"
-                                onError={(e) => {
-                                    e.target.onerror = null; // Prevent loop
-                                    e.target.style.display = 'none';
-                                }}
                             />
                         )}
                         <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white font-mono text-xs z-10">
