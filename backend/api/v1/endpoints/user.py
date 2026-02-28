@@ -21,6 +21,7 @@ from backend.services.detection_service import detection_service
 from backend.storage.storage_factory import storage
 from backend.core.config import settings
 from backend.core.security import verify_password, hash_password
+from backend.core.websocket_manager import manager
 
 router = APIRouter(prefix="", tags=["User"])
 
@@ -162,6 +163,36 @@ async def save_alert(db: Session, user_id: uuid.UUID, upload_id: uuid.UUID, dete
             f"[{timestamp}] WARNING: Weapon Detected -> {detection['class_name']} "
             f"in file: {image_path} (user_id: {user_id})\n"
         )
+        
+    db.commit()
+    db.refresh(alert)
+    
+    # Broadcast to admins using WebSocket
+    # We create a dictionary containing exactly what the frontend expects
+    user = db.query(User).filter(User.id == user_id).first()
+    upload = db.query(Upload).filter(Upload.id == upload_id).first()
+    
+    alert_payload = {
+        "id": str(alert.id),
+        "user_id": str(alert.user_id),
+        "user_email": user.email if user else "Unknown User",
+        "upload_id": str(alert.upload_id),
+        "filename": upload.filename if upload else "Unknown File",
+        "object_name": alert.object_name,
+        "threat_level": alert.threat_level.value,
+        "confidence": float(alert.confidence),
+        "timestamp": alert.timestamp.isoformat(),
+        "image_path": alert.image_path,
+        "status": alert.status.value,
+        "admin_notes": alert.admin_notes
+    }
+    
+    # We must use asyncio.create_task because broadcast_to_admins is an async function
+    import asyncio
+    asyncio.create_task(manager.broadcast_to_admins({
+        "type": "new_alert",
+        "data": alert_payload
+    }))
 
 
 @router.post("/detect/image", response_model=DetectionResponse)

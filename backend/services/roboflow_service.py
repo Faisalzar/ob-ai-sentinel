@@ -99,11 +99,11 @@ class RoboflowDetectionService:
             
             # Color based on threat level
             if threat_level == "dangerous":
-                color = (0, 0, 255)  # Red
+                color = (68, 68, 239)  # Red
             elif threat_level == "caution":
-                color = (0, 255, 255)  # Yellow
+                color = (8, 179, 234)  # Yellow
             else:
-                color = (0, 255, 0)  # Green
+                color = (94, 197, 34)  # Green
             
             # Draw bounding box
             cv2.rectangle(annotated_img, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)

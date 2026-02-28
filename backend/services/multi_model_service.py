@@ -565,12 +565,16 @@ class MultiModelRoboflowService:
     def _annotate_image(self, img: np.ndarray, detections: List[Dict[str, Any]]) -> np.ndarray:
         """Draw boxes and labels like local script (weapons red, others green)"""
         annotated_img = img.copy()
-        placed = []
         for det in detections:
             bbox = det['bbox']
             x1, y1, x2, y2 = int(bbox['x1']), int(bbox['y1']), int(bbox['x2']), int(bbox['y2'])
             label = f"{det['class_name']}: {float(det['confidence']):.2f}"
-            color = (0, 0, 255) if _is_weapon(det['class_name']) else (0, 255, 0)
+            
+            # Determine Color
+            threat_level = det.get('threat_level', 'harmless')
+            color = (68, 68, 239) if threat_level == "dangerous" else \
+                    (8, 179, 234) if threat_level == "caution" else (94, 197, 34)
+                    
             cv2.rectangle(annotated_img, (x1, y1), (x2, y2), color, 2)
             _draw_label_clamped(annotated_img, x1, y1, label, color, placed)
         return annotated_img

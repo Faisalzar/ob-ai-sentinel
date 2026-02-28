@@ -6,7 +6,9 @@ import { AlertsFilter } from '../../components/admin/AlertsFilter';
 import { AlertList } from '../../components/admin/AlertList';
 import { AlertDetailsModal } from '../../components/admin/AlertDetailsModal';
 import BasicPagination from '../../components/ui/basic-pagination';
-import { Loader2, Download } from 'lucide-react';
+import { Loader2, Download, ShieldAlert } from 'lucide-react';
+import { useAdminWebsocket } from '../../hooks/useAdminWebsocket';
+import { toast } from 'react-hot-toast';
 import '../../styles/dashboard.css';
 
 const AdminAlertsPage = () => {
@@ -24,6 +26,26 @@ const AdminAlertsPage = () => {
   const [filters, setFilters] = useState({
     severity: '',
     status: ''
+  });
+
+  // WebSocket Live Updates
+  useAdminWebsocket((newAlert) => {
+    // Show toast notification
+    toast.error(
+      `NEW THREAT: ${newAlert.object_name} detected!`,
+      {
+        duration: 8000,
+        position: 'top-right',
+        style: { border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(239, 68, 68, 0.9)', color: '#fff' }
+      }
+    );
+
+    // Live inject into alerts table
+    setAlerts(prev => [newAlert, ...prev]);
+
+    // Update stats dynamically if possible, or trigger reload 
+    // (Here we just trigger reload for simplicity to recalculate all stats properly)
+    loadData();
   });
 
   useEffect(() => {

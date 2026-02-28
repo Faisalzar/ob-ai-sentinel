@@ -110,13 +110,13 @@ class AIDetectionService:
                 # Determine threat level
                 threat_level = get_threat_level(class_name)
                 
-                # Color based on threat level
+                # Color based on threat level (Matches Web UI Hex Codes in BGR format)
                 if threat_level == "dangerous":
-                    color = (0, 0, 255)  # Red
+                    color = (68, 68, 239)  # Red (#ef4444)
                 elif threat_level == "caution":
-                    color = (0, 255, 255)  # Yellow
+                    color = (8, 179, 234)  # Yellow (#eab308)
                 else:
-                    color = (0, 255, 0)  # Green
+                    color = (94, 197, 34)  # Green (#22c55e)
                 
                 # Draw bounding box
                 cv2.rectangle(annotated_img, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
@@ -217,8 +217,8 @@ class AIDetectionService:
                         confidence = det["confidence"]
                         threat_level = det["threat_level"]
                         
-                        color = (0, 0, 255) if threat_level == "dangerous" else \
-                                (0, 255, 255) if threat_level == "caution" else (0, 255, 0)
+                        color = (68, 68, 239) if threat_level == "dangerous" else \
+                                (8, 179, 234) if threat_level == "caution" else (94, 197, 34)
                         
                         cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
                         label = f"{class_name}: {confidence:.2f}"
@@ -250,8 +250,8 @@ class AIDetectionService:
                         threat_level = get_threat_level(class_name)
                         
                         # Color based on threat
-                        color = (0, 0, 255) if threat_level == "dangerous" else \
-                                (0, 255, 255) if threat_level == "caution" else (0, 255, 0)
+                        color = (68, 68, 239) if threat_level == "dangerous" else \
+                                (8, 179, 234) if threat_level == "caution" else (94, 197, 34)
                         
                         # Draw box and label
                         cv2.rectangle(annotated_frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)

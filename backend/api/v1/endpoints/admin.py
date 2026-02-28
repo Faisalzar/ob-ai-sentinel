@@ -1,7 +1,7 @@
 """
 Admin API endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from typing import List, Optional
@@ -21,6 +21,8 @@ from backend.schemas.admin import SystemSettingsUpdate, SystemSettingsResponse, 
 from backend.core.dependencies import get_current_admin_user
 from backend.services.ai_service import ai_service
 from backend.services.security_service import log_admin_action
+from backend.core.websocket_manager import manager
+from backend.core.security import decode_token
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -32,6 +34,47 @@ class AdminStatsResponse:
     total_detections: int
     total_alerts: int
     recent_alerts: int  # last 24 hours
+
+
+@router.websocket("/ws/alerts")
+async def websocket_admin_alerts(websocket: WebSocket, token: str, db: Session = Depends(get_db)):
+    """
+    WebSocket endpoint for real-time admin alerts.
+    Expects a valid admin JWT token in the query params: ?token=...
+    """
+    await websocket.accept()
+    
+    try:
+        # Authenticate
+        payload = decode_token(token)
+        if not payload or payload.get("type") != "access":
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+            
+        user_id = payload.get("sub")
+        user = db.query(User).filter(User.id == user_id).first()
+        
+        if not user or user.role != UserRole.ADMIN:
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+            
+        # Register connection
+        manager.admin_connections.append(websocket)
+        logger.info(f"Admin WS Connected: {user.email}")
+        
+        # Keep connection alive till client disconnects
+        try:
+            while True:
+                # Just wait for messages or keepalive pings. We don't expect admin to send much.
+                data = await websocket.receive_text()
+        except WebSocketDisconnect:
+            manager.disconnect_admin(websocket)
+            logger.info(f"Admin WS Disconnected: {user.email}")
+            
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+        if websocket in manager.admin_connections:
+            manager.disconnect_admin(websocket)
 
 
 @router.get("/stats")

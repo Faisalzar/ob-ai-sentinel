@@ -7,7 +7,8 @@ import { QuickActions } from '../../components/ui/quick-actions';
 import { SystemStatus } from '../../components/ui/system-status';
 import { RecentActivity } from '../../components/ui/recent-activity';
 import { adminService } from '../../services/adminService';
-
+import { useAdminWebsocket } from '../../hooks/useAdminWebsocket';
+import { toast } from 'react-hot-toast';
 
 
 export default function AdminDashboard() {
@@ -20,6 +21,31 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Setup WebSocket connection
+  useAdminWebsocket((newAlert) => {
+    // 1. Show Toast
+    toast.error(
+      `DANGER: ${newAlert.object_name} detected! (${Math.round(newAlert.confidence * 100)}%)`,
+      {
+        duration: 8000,
+        position: 'top-right',
+        style: {
+          background: 'rgba(239, 68, 68, 0.9)',
+          color: '#fff',
+          border: '1px solid rgba(255,255,255,0.2)',
+          backdropFilter: 'blur(8px)',
+        },
+        iconTheme: {
+          primary: '#fff',
+          secondary: '#ef4444'
+        }
+      }
+    );
+
+    // 2. Refresh stats to update Dashboard visually without full reload
+    loadData();
+  });
 
   const loadData = async () => {
     try {
