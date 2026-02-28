@@ -12,6 +12,11 @@ export const AlertList = ({ alerts, onStatusChange, onAddNote, onView, startInde
         return `${API_BASE_URL.replace('/api/v1', '')}/${cleanPath}`;
     };
 
+    const isVideo = (path) => {
+        if (!path) return false;
+        return path.match(/\.(mp4|webm|ogg|mov|avi)$/i);
+    };
+
     const getSeverityConfig = (level) => {
         const l = level?.toUpperCase();
         if (l === 'DANGEROUS') return { color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
@@ -75,16 +80,30 @@ export const AlertList = ({ alerts, onStatusChange, onAddNote, onView, startInde
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div
-                                                className="h-10 w-16 overflow-hidden rounded bg-black/50 cursor-pointer hover:ring-2 ring-red-500/50 transition-all"
+                                                className="h-10 w-16 overflow-hidden rounded bg-black/50 cursor-pointer hover:ring-2 ring-red-500/50 transition-all flex items-center justify-center group/vid"
                                                 onClick={() => onView(alert)}
                                             >
                                                 {alert.image_path && (
-                                                    <img
-                                                        src={getPreviewUrl(alert.image_path)}
-                                                        alt=""
-                                                        className="h-full w-full object-cover"
-                                                        onError={(e) => e.target.style.display = 'none'}
-                                                    />
+                                                    isVideo(alert.image_path) ? (
+                                                        <>
+                                                            <video
+                                                                src={getPreviewUrl(alert.image_path)}
+                                                                className="h-full w-full object-cover"
+                                                                preload="metadata"
+                                                                muted
+                                                            />
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover/vid:opacity-100 transition-opacity">
+                                                                <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <img
+                                                            src={getPreviewUrl(alert.image_path)}
+                                                            alt=""
+                                                            className="h-full w-full object-cover"
+                                                            onError={(e) => e.target.style.display = 'none'}
+                                                        />
+                                                    )
                                                 )}
                                             </div>
                                             <span className="font-medium text-white">{alert.object_name}</span>

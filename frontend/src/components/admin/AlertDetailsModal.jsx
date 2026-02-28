@@ -16,6 +16,11 @@ export const AlertDetailsModal = ({ alert, onClose, onUpdateStatus, onUpdateNote
         return `${API_BASE_URL.replace('/api/v1', '')}/${cleanPath}`;
     };
 
+    const isVideo = (path) => {
+        if (!path) return false;
+        return path.match(/\.(mp4|webm|ogg|mov|avi)$/i);
+    };
+
     const handleSaveNote = () => {
         onUpdateNote(alert.id, note);
         setIsEditingNote(false);
@@ -42,19 +47,28 @@ export const AlertDetailsModal = ({ alert, onClose, onUpdateStatus, onUpdateNote
                     className="relative w-full max-w-6xl h-[85vh] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl flex"
                     onClick={e => e.stopPropagation()}
                 >
-                    {/* Left: Image Preview */}
+                    {/* Left: Image/Video Preview */}
                     <div className="flex-1 bg-black flex items-center justify-center relative border-r border-white/10 p-4">
-                        <img
-                            src={getPreviewUrl(alert.image_path)}
-                            alt={alert.object_name}
-                            className="max-h-full max-w-full object-contain"
-                            onError={(e) => {
-                                e.target.onerror = null; // Prevent loop
-                                // Try fallback if needed, but alert image path is specific
-                                e.target.style.display = 'none';
-                            }}
-                        />
-                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white font-mono text-xs">
+                        {isVideo(alert.image_path) ? (
+                            <video
+                                src={getPreviewUrl(alert.image_path)}
+                                className="max-h-full max-w-full object-contain"
+                                controls
+                                autoPlay
+                                muted
+                            />
+                        ) : (
+                            <img
+                                src={getPreviewUrl(alert.image_path)}
+                                alt={alert.object_name}
+                                className="max-h-full max-w-full object-contain"
+                                onError={(e) => {
+                                    e.target.onerror = null; // Prevent loop
+                                    e.target.style.display = 'none';
+                                }}
+                            />
+                        )}
+                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white font-mono text-xs z-10">
                             {alert.filename}
                         </div>
                     </div>
