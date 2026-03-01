@@ -152,7 +152,7 @@ const MfaPage = () => {
                 <p>
                   {isRecovery
                     ? <span>Code sent to <span className="font-mono text-purple-300 bg-purple-500/10 px-2 rounded">{maskEmail(pendingEmail)}</span></span>
-                    : "Enter the 6-digit code from your app"}
+                    : "Enter the 6-digit code from your app, or an 8-character backup code"}
                 </p>
               </div>
 
@@ -173,21 +173,21 @@ const MfaPage = () => {
               <form onSubmit={handleSubmit} className="auth-form">
                 <div className="input-wrapper">
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 600 }}>
-                    {isRecovery ? "Recovery OTP" : "Validator Code"}
+                    {isRecovery ? "Recovery OTP" : "Validator / Backup Code"}
                   </label>
                   <div style={{ position: 'relative' }}>
                     <Lock className="input-icon" />
                     <input
                       type="text"
                       value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ''))}
-                      maxLength={6}
-                      placeholder="• • • • • •"
-                      className="text-center tracking-[0.5em] font-mono text-lg"
+                      onChange={(e) => setCode(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                      maxLength={8}
+                      placeholder="6-digit / 8-char"
+                      className="text-center tracking-[0.2em] font-mono text-lg"
                       required
                       autoFocus
                       autoComplete="one-time-code"
-                      style={{ letterSpacing: '0.5em', textAlign: 'center', paddingLeft: '1rem' }}
+                      style={{ letterSpacing: '0.2em', textAlign: 'center', paddingLeft: '1rem' }}
                     />
                   </div>
                 </div>
@@ -197,7 +197,7 @@ const MfaPage = () => {
                   className={`submit-btn ${isRecovery ? 'bg-blue-600 hover:bg-blue-500' : ''}`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={submitting || code.length !== 6}
+                  disabled={submitting || (code.length !== 6 && code.length !== 8)}
                 >
                   {submitting ? "Verifying..." : (isRecovery ? "Recover Account" : "Verify Session")}
                   {!submitting && <ArrowRight size={18} />}

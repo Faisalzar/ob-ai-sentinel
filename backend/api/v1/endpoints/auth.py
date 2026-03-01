@@ -266,11 +266,27 @@ async def verify_mfa(
         
         secret = decrypt_data(user.mfa_secret_encrypted)
         
-        if not verify_totp(secret, mfa_data.token):
+        # Check if it's a backup code
+        is_backup_code = False
+        if user.backup_codes_encrypted:
+            try:
+                backup_codes = decrypt_data(user.backup_codes_encrypted).split(",")
+                code_to_check = mfa_data.token.strip()
+                if code_to_check in backup_codes:
+                    is_backup_code = True
+                    backup_codes.remove(code_to_check)
+                    if backup_codes:
+                        user.backup_codes_encrypted = encrypt_data(",".join(backup_codes))
+                    else:
+                        user.backup_codes_encrypted = None
+            except Exception as e:
+                logger.error(f"Error checking backup codes: {e}")
+                
+        if not is_backup_code and not verify_totp(secret, mfa_data.token):
             create_audit_log(db, user.id, "mfa_verify", "failed")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid MFA code"
+                detail="Invalid MFA code or backup code"
             )
         
         # Create tokens
