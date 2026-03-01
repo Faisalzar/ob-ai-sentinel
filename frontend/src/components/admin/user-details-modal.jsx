@@ -112,9 +112,9 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
                                     <InfoCard icon={Shield} label="MFA Status" value={user.mfa_state || 'DISABLED'} />
                                     <InfoCard
                                         icon={Mail}
-                                        label="Email Verified"
-                                        value={user.is_verified ? 'Yes' : 'No'}
-                                        valueColor={user.is_verified ? 'text-green-400' : 'text-orange-400'}
+                                        label="Verified (Logged In)"
+                                        value={user.last_login_at ? 'Yes' : 'No'}
+                                        valueColor={user.last_login_at ? 'text-green-400' : 'text-orange-400'}
                                     />
                                     <InfoCard
                                         icon={Calendar}

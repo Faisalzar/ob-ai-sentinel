@@ -101,9 +101,9 @@ const AdminUsersPage = () => {
 
     // Verified filter
     if (filters.verified === 'yes') {
-      filtered = filtered.filter(u => u.is_verified);
+      filtered = filtered.filter(u => u.last_login_at);
     } else if (filters.verified === 'no') {
-      filtered = filtered.filter(u => !u.is_verified);
+      filtered = filtered.filter(u => !u.last_login_at);
     }
 
     setFilteredUsers(filtered);
@@ -231,7 +231,7 @@ const AdminUsersPage = () => {
         u.role,
         u.is_active ? 'Active' : 'Suspended',
         u.mfa_state,
-        u.is_verified ? 'Yes' : 'No',
+        u.last_login_at ? 'Yes' : 'No',
         u.last_login_at || 'Never'
       ])
     ].map(row => row.join(',')).join('\n');
@@ -375,7 +375,7 @@ const AdminUsersPage = () => {
                         <span className="text-sm text-zinc-400">{user.mfa_state || 'DISABLED'}</span>
                       </td>
                       <td className="px-4 py-4">
-                        {user.is_verified ? (
+                        {user.last_login_at ? (
                           <Check className="h-4 w-4 text-green-400" />
                         ) : (
                           <XIcon className="h-4 w-4 text-red-400" />
