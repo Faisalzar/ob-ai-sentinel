@@ -51,6 +51,20 @@ async def _get_current_user_base(
             detail="User not found"
         )
     
+    # Enforce instant logout (e.g., from force_logout)
+    if payload.get("type") == "access":
+        from backend.models.models import Session as UserSession
+        active_session = db.query(UserSession).filter(
+            UserSession.user_id == user_id,
+            UserSession.is_valid == True
+        ).first()
+        
+        if not active_session:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Session expired or terminated"
+            )
+    
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -131,6 +145,15 @@ async def get_current_active_user_strict(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        
+    from backend.models.models import Session as UserSession
+    active_session = db.query(UserSession).filter(
+        UserSession.user_id == user_id,
+        UserSession.is_valid == True
+    ).first()
+    
+    if not active_session:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired or terminated")
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive")
     return user
