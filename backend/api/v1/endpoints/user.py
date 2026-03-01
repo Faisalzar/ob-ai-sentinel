@@ -244,12 +244,19 @@ async def detect_image(
     is_live_capture = file.filename.startswith("live_capture_") or file.filename == "frame.jpg"
     upload_type = FileType.LIVE if is_live_capture else FileType.IMAGE
     
-    # Create upload record (file_path will just be the local temp path for now, we'll update it later or it doesn't matter since we rely on annotated_path)
+    # Upload original to Storage
+    try:
+        remote_orig_url = await storage.save_file(file_content, f"user_{current_user.id}/{unique_filename}")
+        orig_file_path = remote_orig_url
+    except Exception:
+        orig_file_path = f"user_{current_user.id}/{unique_filename}"
+
+    # Create upload record
     upload = Upload(
         user_id=current_user.id,
         filename=file.filename,
         file_type=upload_type,
-        file_path=f"user_{current_user.id}/{unique_filename}",
+        file_path=orig_file_path,
         file_size=len(file_content)
     )
     db.add(upload)

@@ -267,8 +267,8 @@ const AdminUsersPage = () => {
           <Icon className={`h-5 w-5 ${title.includes('Admin') ? 'text-purple-400' : 'text-blue-400'}`} />
           {title}
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium border ${title.includes('Admin')
-              ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-              : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+            ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+            : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
             }`}>
             {title.includes('Admin') ? adminUsers.length : regularUsers.length}
           </span>
@@ -329,8 +329,8 @@ const AdminUsersPage = () => {
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br border ${user.role === 'ADMIN'
-                              ? 'from-purple-500/20 to-purple-600/20 border-purple-500/30'
-                              : 'from-blue-500/20 to-blue-600/20 border-blue-500/30'
+                            ? 'from-purple-500/20 to-purple-600/20 border-purple-500/30'
+                            : 'from-blue-500/20 to-blue-600/20 border-blue-500/30'
                             }`}>
                             <span className={`text-sm font-semibold ${user.role === 'ADMIN' ? 'text-purple-400' : 'text-blue-400'}`}>
                               {user.name?.charAt(0).toUpperCase()}
@@ -343,18 +343,31 @@ const AdminUsersPage = () => {
                         </div>
                       </td>
                       <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          {user.is_online && (
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                          )}
-                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${user.is_active
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                            : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        <div className="flex flex-col gap-1.5 items-start">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-[10px] uppercase font-bold tracking-wider ${user.is_active
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
                             }`}>
-                            {user.is_active ? 'Active' : 'Suspended'}
+                            {user.is_active ? 'Account Active' : 'Suspended'}
+                          </span>
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium border ${user.is_online
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                            }`}>
+                            {user.is_online ? (
+                              <>
+                                <span className="relative flex h-1.5 w-1.5">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                </span>
+                                Online
+                              </>
+                            ) : (
+                              <>
+                                <span className="h-1.5 w-1.5 rounded-full bg-zinc-600"></span>
+                                Offline
+                              </>
+                            )}
                           </span>
                         </div>
                       </td>
@@ -383,7 +396,7 @@ const AdminUsersPage = () => {
                           </button>
 
                           {openDropdown === user.id && (
-                            <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-white/10 bg-zinc-900 shadow-xl">
+                            <div className={`absolute right-0 z-50 w-48 rounded-lg border border-white/10 bg-zinc-900 shadow-2xl ${displayedUsers.length > 3 && displayedUsers.indexOf(user) >= displayedUsers.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
                               <button
                                 onClick={() => handleToggleActive(user)}
                                 disabled={actionLoading === user.id}

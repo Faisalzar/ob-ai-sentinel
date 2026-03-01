@@ -1,9 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Activity, Shield, Monitor, Mail, Calendar, Clock, MapPin, Smartphone, Lock } from 'lucide-react';
+import { X, User, Activity, Shield, Monitor, Mail, Calendar, Clock, MapPin, Smartphone, Lock, RefreshCw } from 'lucide-react';
+import { adminService } from '../../services/adminService';
 
 export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
     const [activeTab, setActiveTab] = useState('overview');
+    const [activities, setActivities] = useState([]);
+    const [loadingActivity, setLoadingActivity] = useState(false);
+
+    useEffect(() => {
+        if (user && activeTab === 'activity') {
+            loadActivity();
+        }
+    }, [user, activeTab]);
+
+    const loadActivity = async () => {
+        setLoadingActivity(true);
+        try {
+            const data = await adminService.getAuditLogs(0, 50, user.id);
+            setActivities(data);
+        } catch (error) {
+            console.error('Error fetching user activity', error);
+        } finally {
+            setLoadingActivity(false);
+        }
+    };
 
     if (!user) return null;
 
@@ -11,20 +32,15 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
         { id: 'overview', label: 'Overview', icon: User },
         { id: 'activity', label: 'Activity', icon: Activity },
         { id: 'security', label: 'Security', icon: Shield },
-        { id: 'sessions', label: 'Sessions', icon: Monitor }
     ];
 
-    const mockActivity = [
-        { id: 1, action: 'Logged in', timestamp: '2 hours ago', icon: User, color: 'text-green-400' },
-        { id: 2, action: 'Uploaded detection image', timestamp: '5 hours ago', icon: Activity, color: 'text-blue-400' },
-        { id: 3, action: 'Changed password', timestamp: '1 day ago', icon: Shield, color: 'text-purple-400' },
-        { id: 4, action: 'Enabled MFA', timestamp: '2 days ago', icon: Shield, color: 'text-green-400' },
-    ];
-
-    const mockSessions = [
-        { id: 1, device: 'Chrome on Windows', ip: '192.168.1.1', location: 'New York, US', lastActive: '5 mins ago', current: true },
-        { id: 2, device: 'Safari on iPhone', ip: '192.168.1.2', location: 'New York, US', lastActive: '2 hours ago', current: false },
-    ];
+    const getActivityIcon = (action) => {
+        const actionLower = action?.toLowerCase() || '';
+        if (actionLower.includes('login') || actionLower.includes('logout')) return { icon: User, color: 'text-green-400' };
+        if (actionLower.includes('password') || actionLower.includes('mfa')) return { icon: Shield, color: 'text-purple-400' };
+        if (actionLower.includes('upload') || actionLower.includes('detect')) return { icon: Activity, color: 'text-blue-400' };
+        return { icon: Activity, color: 'text-zinc-400' };
+    };
 
     return (
         <AnimatePresence>
@@ -117,19 +133,34 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
                         {activeTab === 'activity' && (
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
-                                <div className="space-y-3">
-                                    {mockActivity.map((item) => (
-                                        <div key={item.id} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
-                                            <div className={`rounded-lg bg-white/10 p-2 ${item.color}`}>
-                                                <item.icon className="h-4 w-4" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-medium text-white">{item.action}</p>
-                                                <p className="text-xs text-zinc-500">{item.timestamp}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                {loadingActivity ? (
+                                    <div className="flex justify-center py-8">
+                                        <RefreshCw className="h-6 w-6 animate-spin text-purple-500" />
+                                    </div>
+                                ) : activities.length === 0 ? (
+                                    <div className="text-center py-8 text-zinc-500 text-sm">
+                                        No activity found.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {activities.map((item) => {
+                                            const { icon: ItemIcon, color } = getActivityIcon(item.action);
+                                            return (
+                                                <div key={item.id} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 p-4">
+                                                    <div className={`rounded-lg bg-white/10 p-2 ${color}`}>
+                                                        <ItemIcon className="h-4 w-4" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-white">{item.action} {item.resource ? `- ${item.resource}` : ''}</p>
+                                                        <p className="text-xs text-zinc-500">
+                                                            {new Date(item.created_at).toLocaleString()} {item.ip_address ? ` • ${item.ip_address}` : ''}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -168,42 +199,7 @@ export const UserDetailsModal = ({ user, onClose, onUpdate }) => {
                             </div>
                         )}
 
-                        {activeTab === 'sessions' && (
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-white mb-4">Active Sessions</h3>
-                                <div className="space-y-3">
-                                    {mockSessions.map((session) => (
-                                        <div key={session.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex items-start gap-3">
-                                                    <div className="rounded-lg bg-white/10 p-2 text-blue-400">
-                                                        {session.device.includes('iPhone') ? <Smartphone className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-white flex items-center gap-2">
-                                                            {session.device}
-                                                            {session.current && (
-                                                                <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-xs text-green-400">Current</span>
-                                                            )}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-500 mt-1">
-                                                            <MapPin className="inline h-3 w-3 mr-1" />
-                                                            {session.location} • {session.ip}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-500">Last active: {session.lastActive}</p>
-                                                    </div>
-                                                </div>
-                                                {!session.current && (
-                                                    <button className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs text-red-400 hover:bg-red-500/20">
-                                                        Revoke
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+
                     </div>
                 </motion.div>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Image, Video, Radio, Activity } from 'lucide-react';
+import { Image as ImageIcon, Video, Radio, Activity } from 'lucide-react';
 
 const UserMediaStats = ({ stats }) => {
     // Fallbacks if stats not fully loaded
@@ -11,7 +11,7 @@ const UserMediaStats = ({ stats }) => {
             id: 1,
             label: 'Images Scanned',
             count: safeStats.image_count || 0,
-            icon: Image,
+            icon: ImageIcon,
             color: 'from-blue-600/20 to-blue-900/20',
             iconColor: 'text-blue-400'
         },
