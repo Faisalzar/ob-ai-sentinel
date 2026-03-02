@@ -180,9 +180,9 @@ const MfaPage = () => {
                     <input
                       type="text"
                       value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
-                      maxLength={8}
-                      placeholder="6-digit / 8-char"
+                      onChange={(e) => setCode(e.target.value.replace(isRecovery ? /[^0-9]/g : /[^a-zA-Z0-9]/g, ''))}
+                      maxLength={isRecovery ? 6 : 8}
+                      placeholder={isRecovery ? "• • • • • •" : "6-digit / 8-char"}
                       className="text-center tracking-[0.2em] font-mono text-lg"
                       required
                       autoFocus
