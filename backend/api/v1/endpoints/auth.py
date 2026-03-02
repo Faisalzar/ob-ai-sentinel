@@ -284,9 +284,14 @@ async def verify_mfa(
                 
         if not is_backup_code and not verify_totp(secret, mfa_data.token):
             create_audit_log(db, user.id, "mfa_verify", "failed")
+            
+            detail_msg = "Invalid MFA code or backup code"
+            if len(mfa_data.token.strip()) == 8:
+                detail_msg = "This backup code is invalid or has already been used."
+                
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid MFA code or backup code"
+                detail=detail_msg
             )
         
         # Create tokens
