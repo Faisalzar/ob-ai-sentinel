@@ -70,7 +70,14 @@ export const AuthProvider = ({ children }) => {
     setAuthStep('idle');
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (token) {
+      try {
+        await api.post('/auth/logout');
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
+    }
     setUser(null);
     setToken(null);
     setPendingLogin(null);

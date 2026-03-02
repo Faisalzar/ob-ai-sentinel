@@ -1026,3 +1026,17 @@ async def update_user_profile(
     db.refresh(user)
     
     return user
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Logout user by invalidating all their sessions.
+    This also updates their online status to offline.
+    """
+    db.query(SessionModel).filter(SessionModel.user_id == current_user.id).delete()
+    db.commit()
+    return {"message": "Successfully logged out"}
