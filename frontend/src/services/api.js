@@ -39,6 +39,7 @@ export const apiRequest = async (endpoint, options = {}) => {
         (data.detail !== 'Invalid password' &&
           data.detail !== 'Invalid credentials' &&
           !data.detail.includes('Invalid MFA') &&
+          !data.detail.includes('backup code') &&
           !data.detail.includes('Invalid or expired session') &&
           !data.detail.includes('session expired'));
 

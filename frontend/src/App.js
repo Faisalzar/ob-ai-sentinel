@@ -5,6 +5,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import RedirectIfAuthenticated from './components/common/RedirectIfAuthenticated';
 import ScrollToTop from './components/common/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 
 // Public pages
 import HomePage from './pages/public/HomePage';
@@ -68,6 +69,23 @@ function App() {
 
   return (
     <AuthProvider>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          error: {
+            style: {
+              background: '#ef4444',
+              color: '#fff',
+            },
+          },
+          success: {
+            style: {
+              background: '#22c55e',
+              color: '#fff',
+            },
+          },
+        }}
+      />
       <AppContent theme={theme} handleToggleTheme={handleToggleTheme} />
     </AuthProvider>
   );
