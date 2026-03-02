@@ -21,7 +21,7 @@ from backend.db.base import get_db
 from datetime import datetime
 from backend.models.models import User, Upload, Alert, AuditLog, Detection, UserRole, Session as UserSession, AlertStatus, SystemSettings, MFAState
 from backend.schemas.user import UserResponse, UploadResponse
-from backend.schemas.admin import SystemSettingsUpdate, SystemSettingsResponse, AlertUpdate, AlertResponse, CreateUserRequest
+from backend.schemas.admin import SystemSettingsUpdate, SystemSettingsResponse, AlertUpdate, AlertResponse, CreateUserRequest, UpdateUserRequest
 from backend.core.dependencies import get_current_admin_user
 from backend.services.ai_service import ai_service
 from backend.services.security_service import log_admin_action
@@ -238,8 +238,7 @@ async def create_user(
 @router.put("/users/{user_id}")
 async def update_user(
     user_id: uuid.UUID,
-    is_active: Optional[bool] = None,
-    role: Optional[UserRole] = None,
+    user_data: UpdateUserRequest,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -255,20 +254,20 @@ async def update_user(
         )
     
     # Prevent self-demotion
-    if user.id == current_user.id and role and role != UserRole.ADMIN:
+    if user.id == current_user.id and user_data.role and user_data.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot demote yourself"
         )
     
     updates = []
-    if is_active is not None:
-        user.is_active = is_active
-        updates.append(f"active={is_active}")
+    if user_data.is_active is not None:
+        user.is_active = user_data.is_active
+        updates.append(f"active={user_data.is_active}")
     
-    if role is not None:
-        user.role = role
-        updates.append(f"role={role}")
+    if user_data.role is not None:
+        user.role = user_data.role
+        updates.append(f"role={user_data.role}")
     
     db.commit()
     db.refresh(user)

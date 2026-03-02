@@ -50,6 +50,13 @@ export const apiRequest = async (endpoint, options = {}) => {
       }
     }
 
+    // Handle 403 inactive user to auto-logout suspended accounts
+    if (response.status === 403 && (data.detail === "Inactive user" || data.detail === "User account is inactive" || data.detail === "Account suspended by administrator")) {
+      localStorage.removeItem('auth');
+      window.location.href = '/login';
+      throw new Error('Account suspended');
+    }
+
     let errorMessage = 'Request failed';
     if (data.detail) {
       if (Array.isArray(data.detail)) {
@@ -89,6 +96,11 @@ export const uploadFile = async (endpoint, formData) => {
   const data = await response.json();
 
   if (!response.ok) {
+    if (response.status === 403 && (data.detail === "Inactive user" || data.detail === "User account is inactive" || data.detail === "Account suspended by administrator")) {
+      localStorage.removeItem('auth');
+      window.location.href = '/login';
+      throw new Error('Account suspended');
+    }
     throw new Error(data.detail || 'Upload failed');
   }
 

@@ -11,6 +11,10 @@ class CreateUserRequest(BaseModel):
     role: UserRole = UserRole.USER
     is_active: bool = True
 
+class UpdateUserRequest(BaseModel):
+    is_active: Optional[bool] = None
+    role: Optional[UserRole] = None
+
 # Settings
 class SystemSettingsBase(BaseModel):
     primary_engine: str = "roboflow"
